@@ -37,6 +37,8 @@ static	void			Hex(const unsigned char* data, int len, FILE*);
 static	void			HorizontalLine();
 		// New line
 static	void			NewLine();
+
+static	void			Print(const char*);
 };
 
 }		// owl

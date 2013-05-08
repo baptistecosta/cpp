@@ -2,53 +2,59 @@
 	bEngine	::	2011 - 2012
 	@author		Baptiste Costa
 */
-
-	#include <stdarg.h>
+#ifdef _WIN32
 	#include <Windows.h>
+#endif
+	#include <ctype.h>
+	#include <stdarg.h>
 	#include "log.h"
 	#include "string.h"
 
-using namespace owl;
+	using namespace owl;
 
-//-----------------------------------------------------------------------------
-const bool		Log::log =
-#if _DEBUG
-	true;
+#ifdef _DEBUG		// Windows
+	const bool	Log::log = true;
 #else
-	false;
+	#ifndef NDEBUG	// Linux
+		const bool	Log::log = true;
+	#else
+		const bool	Log::log = false;
+	#endif
 #endif
 
 //-----------------------------------------------------------------------------
 void			Log::i(const String& msg)
 {	if (Log::log) Log::i(msg.cStr());	}
-//-----------------------------------------------------------------------------
 void			Log::i(const char* format, ...)
 {
 	if (Log::log)
 	{
 		va_list varg;
 		va_start(varg, format);
-		String out = String::Format("Info: %s\n", StringTools::Format(format, varg));
-		OutputDebugStringA(out.cStr());
+		String str = StringTools::Format(format, varg);
+		String out = String::Format("Info: %s\n", str.cStr());
+		Print(out.cStr());
 		va_end(varg);
 	}
 }
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 void			Log::e(const String& msg)
 {	if (Log::log) Log::e(msg.cStr());	}
-//-----------------------------------------------------------------------------
 void			Log::e(const char* format, ...)
 {
 	if (Log::log) 
 	{
 		va_list varg;
 		va_start(varg, format);
-		String out = String::Format("Error: %s\n", StringTools::Format(format, varg));
-		OutputDebugStringA(out.cStr());
+		String str = StringTools::Format(format, varg);
+		String out = String::Format("Error: %s\n", str.cStr());
+		Print(out.cStr());
 		va_end(varg);
 	}
 }
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 void			Log::w(const String& msg)
@@ -59,8 +65,9 @@ void			Log::w(const char* format, ...)
 	{
 		va_list varg;
 		va_start(varg, format);
-		String out = String::Format("Warning: %s\n", StringTools::Format(format, varg));
-		OutputDebugStringA(out.cStr());
+		String str = StringTools::Format(format, varg);
+		String out = String::Format("Warning: %s\n", str.cStr());
+		Print(out.cStr());
 		va_end(varg);
 	}
 }
@@ -75,8 +82,9 @@ void			Log::Flat(const char* format, ...)
 	{
 		va_list varg;
 		va_start(varg, format);
-		String out = String::Format("%s", StringTools::Format(format, varg));
-		OutputDebugStringA(out.cStr());
+		String str = StringTools::Format(format, varg);
+		String out = String::Format("%s", str.cStr());
+		Print(out.cStr());
 		va_end(varg);
 	}
 }
@@ -123,7 +131,17 @@ void			Log::Hex(const unsigned char* data, int len, FILE* f)
 
 //-----------------------------------------------------------------------------
 void			Log::HorizontalLine()
-{	if (Log::log) OutputDebugStringA("\n===============================================================\n");	}
+{	if (Log::log) Print("\n===============================================================\n");	}
 //-----------------------------------------------------------------------------
 void			Log::NewLine()
-{	if (Log::log) OutputDebugStringA("\n");	}
+{	if (Log::log) Print("\n");	}
+
+//-----------------------------------------------------------------------------
+void			Log::Print(const char* out)
+{
+#ifdef _WIN32
+		OutputDebugStringA(out);
+#elif __linux
+		printf(out);
+#endif
+}

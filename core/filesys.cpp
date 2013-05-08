@@ -20,13 +20,13 @@ const bool			FileSystem::Open(const String& path)
 		return false;
 	
 	Close();
-	fopen_s(&f, path.cStr(), "r");
+	f = fopen(path.cStr(), "r");
 	if (!f)
 	{
-		Log::e(String::Format("Fail to open: %s", path));
+		Log::e(String::Format("Fail to open: %s", path.cStr()));
 		return false;
 	}
-	Log::i(String::Format("Open file succeed: %s", path));
+	Log::i(String::Format("Open file succeed: %s", path.cStr()));
 	return true;
 }
 
@@ -46,7 +46,7 @@ const bool			FileSystem::Word(String& w) const
 const bool			FileSystem::Scan(String& line) const
 {
 	char buffer[128] = {0};
-	if (fscanf_s(f, "%s", buffer) == EOF)
+	if (fscanf(f, "%s", buffer) == EOF)
 		return false;
 	line = buffer;
 	return true;

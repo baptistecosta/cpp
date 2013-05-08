@@ -115,7 +115,12 @@ String			StringTools::Format(const char* str_format, va_list varg)
 {
 	char buff[4096];
 	memset(buff, 0, sizeof(buff));
+#ifdef _WIN_32
 	vsnprintf_s(buff, sizeof(buff), _TRUNCATE, str_format, varg);
+#elif __linux
+	vsnprintf(buff, sizeof(buff), str_format, varg);
+#endif
+
 	return String(buff);
 }
 
@@ -353,8 +358,11 @@ String			String::Format(const char* str_format, ...)
 
 	char buff[4096];
 	memset(buff, 0, sizeof(buff));
+#ifdef _WIN_32
 	vsnprintf_s(buff, sizeof(buff), _TRUNCATE, str_format, varg);
-
+#elif __linux
+	vsnprintf(buff, sizeof(buff), str_format, varg);
+#endif
 	va_end(varg);
 
 	return String(buff);
