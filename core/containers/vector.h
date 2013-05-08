@@ -82,37 +82,37 @@ public:
 		enum
 		{	DefCapacity	=	16	};
 
-		const bool is_t_ptr;
+		const bool		is_t_ptr;
 
 protected:
 		
-	T*				m_data;
-	int				m_size,
-					m_capacity;
+		T*				m_data;
+		int				m_size,
+						m_capacity;
 
 public:
 
 		Vector()
-			:	m_data(NULL)
-			,	m_size(0)
-			,	m_capacity(DefCapacity)
-			,	is_t_ptr(IsPointer<T>::val)
+			: m_data(NULL)
+			, m_size(0)
+			, m_capacity(DefCapacity)
+			, is_t_ptr(IsPointer<T>::val)
 		{
-			alloc(m_capacity);
+			Alloc(m_capacity);
 		}
 
 		Vector(const int size)
-			:	m_data(NULL)
-			,	m_size(size)
-			,	m_capacity(size > DefCapacity ? size + DefCapacity : DefCapacity)
-			,	is_t_ptr(IsPointer<T>::val)
+			: m_data(NULL)
+			, m_size(size)
+			, m_capacity(size > DefCapacity ? size + DefCapacity : DefCapacity)
+			, is_t_ptr(IsPointer<T>::val)
 		{
-			alloc(m_capacity);
+			Alloc(m_capacity);
 		}
 
 		~Vector()
 		{
-			clear();
+			Clear();
 		}
 
 		T&				operator []	(int index)
@@ -126,23 +126,35 @@ public:
 			return *this;
 		}
 
-		bool			alloc(int count)
+private:
+
+		bool			Alloc(int count)
 		{
 			delete [] m_data;
 			m_data = new T[count];
 			if (m_data)
 			{
-				m_size = count;
+				for (int i = 0; i < m_capacity; ++i)
+					m_data[i] = 0;
 				LifetimePolicy<T>::onInit(m_data, count);
 				return true;
 			}
 			return false;
 		}
 
+public:
+
+		bool			Realloc(int size)
+		{
+			m_size = size;
+			m_capacity = size > DefCapacity ? size + DefCapacity : DefCapacity;
+			return Alloc(m_capacity);
+		}
+
 		bool			Push(T item)
 		{
 			if (m_size == m_capacity)
-				if (!increaseCapacity())
+				if (!IncreaseCapacity())
 					return false;
 
 			m_data[m_size++] = item;
@@ -151,13 +163,13 @@ public:
 			return true;
 		}
 
-		void			pull()
+		void			Pull()
 		{
 			LifetimePolicy<T>::onPull(m_data[m_size - 1]);
 			--m_size;
 		}
 
-		bool			increaseCapacity(int increase_size = DefCapacity)
+		bool			IncreaseCapacity(int increase_size = DefCapacity)
 		{
 			// Create a temporary array with the proper size.
 			int new_capacity = m_size + increase_size;
@@ -180,20 +192,20 @@ public:
 			return true;
 		}
 
-		T*				getData() const
+		T*				GetData() const
 		{	return m_data;	}
-		T				getData(int i) const
+		T				GetData(int i) const
 		{	assert(i >= 0 && i < m_size); return m_data[i];	}
 
 		const int		Size() const
 		{	return m_size;	}
-		const int		getCapacity() const
+		const int		GetCapacity() const
 		{	return m_capacity;	}
 		
-		const bool		isNull() const
+		const bool		IsNull() const
 		{	return m_data == NULL;	}
 
-		void			clear()
+		void			Clear()
 		{
 			LifetimePolicy<T>::onClear(m_data, m_size);
 			delete [] m_data;

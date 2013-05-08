@@ -4,7 +4,7 @@
 	#include <string>
 	#include <time.h>
 	#include "wlan.h"
-	#include "core/time.h"
+	#include "core/win32/time.h"
 	#include "core/log.h"
 
 	using namespace owl;
