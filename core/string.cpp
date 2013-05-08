@@ -216,9 +216,11 @@ bool			String::Alloc(const int size)
 {
 	delete [] m_str;
 	m_str = new char[size + 1];
+	if (!m_str)
+		return false;
 	for (int i = 0; i < size + 1; i++)
 		m_str[i] = 0;
-	return m_str == NULL;
+	return true;
 }
 
 //---------------------------------------------------------------------------
