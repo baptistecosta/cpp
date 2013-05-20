@@ -9,6 +9,7 @@
 namespace owl {
 
 //!
+
 struct	KeyPress
 {
 static	const bool			leftCtrl();

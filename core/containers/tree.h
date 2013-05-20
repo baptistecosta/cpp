@@ -24,7 +24,7 @@ private:
 
 public:
 
-		Tree()	:	m_parent(null_ptr)	{}
+		Tree()	:	m_parent(NULL)	{}
 		~Tree()
 		{
 			destroy();
@@ -34,7 +34,7 @@ public:
 		void				destroy()
 		{
 			Iterator itr = m_children.iterator();
-			Node* node = null_ptr;
+			Node* node = NULL;
 			itr.begin();
 
 			while(itr.isValid())
@@ -74,7 +74,7 @@ template<class T>	class TreeIterator
 
 public:
 
-		TreeIterator(Node* node = null_ptr)	:	m_node(node)	{}
+		TreeIterator(Node* node = NULL)	:	m_node(node)	{}
 
 		void				operator = (Node* node)
 		{
@@ -167,7 +167,7 @@ public:
 		{
 			if (m_node && m_child_itr.IsValid()) 
 			{ 
-				m_child_itr.Data()->parent = null_ptr; 
+				m_child_itr.Data()->parent = NULL; 
 				m_node->m_children.Remove(m_child_itr); 
 			} 
 		} 
@@ -180,8 +180,8 @@ public:
 
 			else
 			{
-				m_child_itr.list = null_ptr;
-				m_child_itr.node = null_ptr;
+				m_child_itr.list = NULL;
+				m_child_itr.node = NULL;
 			}
 		}
 

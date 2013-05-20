@@ -34,8 +34,8 @@ public:
 //!	\brief	Standard reference counting policy for shared containers.
 template <class T>	struct StandardRefCountPolicy
 {
-	static void		Increment(T p)		{	p->incRef();	}
-	static void		Decrement(T p)		{	p->decRef();	}
+	static void		Increment(T p)		{	p->IncRef();	}
+	static void		Decrement(T p)		{	p->DecRef();	}
 };
 
 //!
@@ -51,9 +51,9 @@ struct	SharedDataTools
 	static void		Copy(T src, T& dest)
 	{
 		if (src != 0)
-			RefCountPolicy<T>::increment(src);
+			RefCountPolicy<T>::Increment(src);
 		if (dest != 0)
-			RefCountPolicy<T>::decrement(dest);
+			RefCountPolicy<T>::Decrement(dest);
 		dest = src;
 	}
 

@@ -24,8 +24,8 @@ public:
 	
 		Node(const T& data)
 			:	m_data(data)
-			,	m_next(null_ptr)
-			,	m_prev(null_ptr)
+			,	m_next(NULL)
+			,	m_prev(NULL)
 		{
 			//
 		}
@@ -48,7 +48,7 @@ public:
 
 	public:
 
-		Iterator(Node* node = null_ptr)
+		Iterator(Node* node = NULL)
 		{
 			reset(node);
 		}
@@ -62,23 +62,23 @@ public:
 				m_next = m_next->getNext();
 			}
 			else
-				m_cur = m_next = null_ptr;
+				m_cur = m_next = NULL;
 			
 			return *this;
 		}
 
-		void			reset(Node* node = null_ptr)
+		void			reset(Node* node = NULL)
 		{
 			m_cur = node;
 			if (m_cur)
 				m_next = m_cur->getNext();
 			else
-				m_next = null_ptr;
+				m_next = NULL;
 
-//			m_next = m_cur ? m_cur->getNext() : null_ptr;
+//			m_next = m_cur ? m_cur->getNext() : NULL;
 		};
 
-		bool			isValid()				{	return m_cur != null_ptr;	}
+		bool			isValid()				{	return m_cur != NULL;	}
 		Node*			getNode()				{	return m_cur;	}
 		Node*			getNext()				{	return m_next;	}
 	};
@@ -92,8 +92,8 @@ protected:
 public:
 
 	List()
-		:	m_root(null_ptr)
-		,	m_last(null_ptr)
+		:	m_root(NULL)
+		,	m_last(NULL)
 		,	m_size(0)
 	{
 		//
@@ -107,7 +107,7 @@ public:
 	Node*			nodeAt(int n)
 	{
 		if (n <= 0 || n > m_size)
-			return null_ptr;
+			return NULL;
 		
 		Node* node = m_root;
 		while (n--)
@@ -118,11 +118,11 @@ public:
 	T&				operator []	(int n) const	{	return nodeAt(n)->getData();	}
 	T&				dataAt(int n) const			{	return nodeAt(n)->getData();	}
 
-	virtual	Node*	append(const T& data, Node* ref_node = null_ptr)
+	virtual	Node*	append(const T& data, Node* ref_node = NULL)
 	{
 		Node* new_node = new Node(data);
 		if (!new_node)
-			return null_ptr;
+			return NULL;
 
 		if (!ref_node)
 		{
@@ -150,11 +150,11 @@ public:
 		return new_node;
 	}
 
-	virtual	Node*	prepend(const T& data, Node* ref_node = null_ptr)
+	virtual	Node*	prepend(const T& data, Node* ref_node = NULL)
 	{
 		Node* new_node = new Node(data);
 		if (!new_node)
-			return null_ptr;
+			return NULL;
 
 		if (!ref_node)
 		{
@@ -184,7 +184,7 @@ public:
 	T*				insert(const T& data, int pos)
 	{
 		Node* ref_node = nodeAt(pos);
-		return ref_node ? prepend(data, ref_node) : null_ptr;
+		return ref_node ? prepend(data, ref_node) : NULL;
 	}
 
 	Node*			find(const T& data)
@@ -192,7 +192,7 @@ public:
 		for (Node* cur_node = m_root; cur_node; cur_node->getNext())
 			if (cur_node->getData() == data)
 				return cur_node;
-		return null_ptr;
+		return NULL;
 	}
 
 	bool			belongsTo(Node* node)
@@ -206,7 +206,7 @@ public:
 	Node*			detach(Node* node)
 	{
 		if (!node)
-			return null_ptr;
+			return NULL;
 
 		assert(belongsTo(node));
 
@@ -215,7 +215,7 @@ public:
 		else
 		{
 			if (node->getNext())
-				node->getNext()->setPrev(null_ptr);
+				node->getNext()->setPrev(NULL);
 			m_root = node->getNext();
 		}
 
@@ -224,12 +224,12 @@ public:
 		else
 		{
 			if (node->getPrev())
-				node->getPrev()->setNext(null_ptr);
+				node->getPrev()->setNext(NULL);
 			m_last = node->getPrev();
 		}
 
-		node->setPrev(null_ptr);
-		node->setNext(null_ptr);
+		node->setPrev(NULL);
+		node->setNext(NULL);
 	
 		--m_size;
 		return node;
@@ -252,7 +252,7 @@ public:
 
 	virtual	void	clear()
 	{
-		Node* next = null_ptr;
+		Node* next = NULL;
 		for (Node* node = m_root; node; node = next)
 		{
 			next = node->getNext();
@@ -260,7 +260,7 @@ public:
 		}
 
 		m_size = 0;
-		m_root = m_last = null_ptr;
+		m_root = m_last = NULL;
 	}
 
 	int				size() const
@@ -282,7 +282,7 @@ public:
 	virtual	~SharedList()
 	{	clear();	}
 
-	virtual	Node*			append(const T& data, Node* ref_node = null_ptr)
+	virtual	Node*			append(const T& data, Node* ref_node = NULL)
 	{
 		T* new_node = List<T>::append(data, ref_node);
 		if (new_node)
@@ -290,7 +290,7 @@ public:
 		return new_node;
 	}
 
-	virtual	Node*			prepend(const T& data, Node* ref_node = null_ptr)
+	virtual	Node*			prepend(const T& data, Node* ref_node = NULL)
 	{
 		T* new_node = List<T>::prepend(data, ref_node);
 		if (new_node)

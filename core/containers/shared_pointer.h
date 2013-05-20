@@ -6,7 +6,7 @@
 #ifndef __SHARED_PTR__
 #define __SHARED_PTR__
 
-	#include "defines.h"
+	#include "typedefs.h"
 	#include "shared_object.h"
 
 namespace owl {

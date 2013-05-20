@@ -18,7 +18,7 @@ template <class T>	struct AutoVectorPolicy
 static	void			onInit(T* data, int size)
 		{
 			for (int i = 0; i < size; ++i)
-				data[i] = NULL;
+				data[i] = 0;
 		}
 
 static	void			onPush(T p) {}
@@ -41,14 +41,14 @@ template <class T>	struct SharedVectorPolicy
 	static void			onInit(T* data, int size)
 	{
 		for (int i = 0; i < size; ++i)
-			data[i] = NULL;
+			data[i] = 0;
 	}
 
 	static void			onPush(T p)
-	{	assert(p); p->incRef();	}
+	{	assert(p); p->IncRef();	}
 
 	static void			onPull(T p)
-	{	assert(p); p->decRef();	}
+	{	assert(p); p->DecRef();	}
 
 	static void			onClear(T* data, int size)
 	{
@@ -93,7 +93,7 @@ protected:
 public:
 
 		Vector()
-			: m_data(NULL)
+			: m_data(0)
 			, m_size(0)
 			, m_capacity(DefCapacity)
 			, is_t_ptr(IsPointer<T>::val)
@@ -102,7 +102,7 @@ public:
 		}
 
 		Vector(const int size)
-			: m_data(NULL)
+			: m_data(0)
 			, m_size(size)
 			, m_capacity(size > DefCapacity ? size + DefCapacity : DefCapacity)
 			, is_t_ptr(IsPointer<T>::val)
@@ -187,7 +187,7 @@ public:
 
 			delete [] m_data;
 			m_data = tmp;
-			tmp = NULL;
+			tmp = 0;
 			
 			return true;
 		}
@@ -203,13 +203,13 @@ public:
 		{	return m_capacity;	}
 		
 		const bool		IsNull() const
-		{	return m_data == NULL;	}
+		{	return m_data == 0;	}
 
 		void			Clear()
 		{
 			LifetimePolicy<T>::onClear(m_data, m_size);
 			delete [] m_data;
-			m_data = NULL;
+			m_data = 0;
 			m_size = 0;
 			m_capacity = DefCapacity;
 		}

@@ -236,7 +236,8 @@ public:
 			node->detach();
 			delete node;
 
-			if (!m_head) m_tail = null_ptr;
+			if (!m_head)
+				m_tail = NULL;
 
 			m_size--;
 		}
@@ -284,7 +285,7 @@ virtual	~DoubleLinkedList_Iterator()	{}
 		void				end()							{	if (m_list) m_node = m_list->tail();	}
 		void				next()							{	if (m_node) m_node = m_node->getNext();	}
 		void				previous()						{	if (m_node) m_node = m_node->getPrev();	}
-		bool				isValid()						{	return (m_node != null_ptr);	}
+		bool				isValid()						{	return (m_node != NULL);	}
 };
 
 }		// owl

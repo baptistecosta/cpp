@@ -131,7 +131,7 @@ public:
 				}
 			}
 		}
-		return null_ptr;
+		return NULL;
 	}
 
 	virtual	void	clear()
@@ -190,7 +190,7 @@ public:
 			return;
 
 		HashMap<Key, Value, HashPolicy>::insert(key, val);
-		StandardRefCountPolicy<Value>::increment(val);
+		StandardRefCountPolicy<Value>::Increment(val);
 	}
 
 	virtual	bool	remove(const Key& key)
@@ -200,7 +200,7 @@ public:
 			Value val = entry->getValue();
 			if (!remove(key))
 				return false;
-			StandardRefCountPolicy<Value>::decrement(val);
+			StandardRefCountPolicy<Value>::Decrement(val);
 			return true;
 		}
 		return false;
@@ -218,7 +218,7 @@ public:
 					if (auto node = itr.getNode())
 					{
 						if (Value val = node->getData().getValue())
-							StandardRefCountPolicy<Value>::decrement(val);
+							StandardRefCountPolicy<Value>::Decrement(val);
 					}
 				}
 			}
