@@ -22,3 +22,10 @@ void			owl::OutputBinary(uchar d, const bool l_end)
 //-----------------------------------------------------------------------------
 unsigned long int owl::Rot32l(const uint val, const uint steps)
 {	return ((val << steps) | (val >> (32 - steps)));	}
+
+//-----------------------------------------------------------------------------
+void			owl::SwapEndian(uchar* in, uchar* out, const int len)
+{
+	for (int i = 0; i < len; i++)
+		out[i] = in[len - i - 1];
+}

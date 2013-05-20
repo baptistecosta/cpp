@@ -6,6 +6,7 @@
 #ifndef __ARRAY__
 #define __ARRAY__
 
+	#include "defines.h"
 	#include "typedefs.h"
 
 namespace owl {
@@ -22,7 +23,7 @@ public:
 
 		Array(int size = 0)
 		{
-			m_cells = NULL;
+			m_cells = null_ptr;
 			if (size > 0)
 			{
 				alloc(size);
@@ -49,7 +50,7 @@ const	T&					operator []	(int index) const
 		void				clear()
 		{
 			delete [] m_cells;
-			m_cells = NULL;
+			m_cells = null_ptr;
 		}
 
 		void				resize(int size)

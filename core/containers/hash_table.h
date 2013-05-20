@@ -10,8 +10,8 @@
 	#include "list.h"
 	#include "shared_object.h"
 	#include "vector.h"
-	#include "core\log.h"
-	#include "core\string.h"
+	#include "core/log.h"
+	#include "core/string.h"
 
 namespace owl {
 
@@ -60,13 +60,17 @@ public:
 
 protected:
 
+	typedef typename	HashMap<Key, Value>::Entry	HMEntry;
+	typedef typename	List<HMEntry>::Iterator		HMIterator;
+	typedef typename	List<HMEntry>::Node			HMNode;
+
 	enum
 	{	DefaultSize	= 33	};
 
 	int				m_capacity
 				,	m_size;
 
-	Array<List<Entry>> m_buckets;
+	Array<List<Entry> > m_buckets;
 
 public:
 
@@ -100,7 +104,7 @@ public:
 		int i = getBucketIndex(key);
 		if (!m_buckets[i].isEmpty())
 		{
-			for (List<Entry>::Iterator itr(m_buckets[i].getRoot()); itr.isValid(); ++itr)
+			for (typename List<Entry>::Iterator itr(m_buckets[i].getRoot()); itr.isValid(); ++itr)
 			{
 				if (itr.getNode())
 				{
@@ -121,9 +125,9 @@ public:
 		List<Entry>& bucket = m_buckets[getBucketIndex(key)];
 		if (!bucket.isEmpty())
 		{
-			for (List<Entry>::Iterator itr(bucket.getRoot()); itr.isValid(); ++itr)
+			for (typename List<Entry>::Iterator itr(bucket.getRoot()); itr.isValid(); ++itr)
 			{
-				if (List<Entry>::Node* node = itr.getNode())
+				if (typename List<Entry>::Node* node = itr.getNode())
 				{
 					String str = node->getData().getKey();
 					if (str == key)
@@ -131,7 +135,7 @@ public:
 				}
 			}
 		}
-		return NULL;
+		return null_ptr;
 	}
 
 	virtual	void	clear()
@@ -144,21 +148,13 @@ public:
 	template <typename Functor> void forEachItem(Functor processFunc)
 	{
 		for (int i = 0; i < m_capacity; ++i)
-		{
-			for (List<HashMap<Key, Value>::Entry>::Iterator itr(m_buckets[i].getRoot()); itr.isValid(); ++itr)
-			{
-				if (auto node = itr.getNode())
-				{
+			for (HMIterator itr(m_buckets[i].getRoot()); itr.isValid(); ++itr)
+				if (HMNode* node = itr.getNode())
 					if (Value val = node->getData().getValue())
-					{
 						processFunc(val);
-					}
-				}
-			}
-		}
 	}
 
-	const Array<List<Entry>>& getBuckets() const
+	const Array<List<Entry> >& getBuckets() const
 	{	return m_buckets;	}
 	const int		getBucketIndex(const Key& key) const
 	{	return HashPolicy::process(key) % m_capacity;	}
@@ -179,6 +175,11 @@ template
 >
 class	SharedHashMap	:	public HashMap<Key, Value, HashPolicy>
 {
+	typedef				HashMap<Key, Value, HashPolicy>	HM;
+	typedef	typename 	HM::Entry						HMEntry;
+	typedef	typename 	List<HMEntry>::Node				ListNode;
+	typedef	typename 	List<HMEntry>::Iterator			ListIterator;
+
 public:
 
 	virtual	~SharedHashMap()
@@ -190,17 +191,17 @@ public:
 			return;
 
 		HashMap<Key, Value, HashPolicy>::insert(key, val);
-		StandardRefCountPolicy<Value>::Increment(val);
+		StandardRefCountPolicy<Value>::increment(val);
 	}
 
 	virtual	bool	remove(const Key& key)
 	{
-		if (Entry* entry = find(key))
+		if (HMEntry* entry = find(key))
 		{
 			Value val = entry->getValue();
 			if (!remove(key))
 				return false;
-			StandardRefCountPolicy<Value>::Decrement(val);
+			StandardRefCountPolicy<Value>::decrement(val);
 			return true;
 		}
 		return false;
@@ -208,22 +209,14 @@ public:
 
 	virtual	void	clear()
 	{
-		int n_size = m_buckets.size();
+		int n_size = HM::m_buckets.size();
 		for (int i = 0; i < n_size; ++i)
-		{
-			if (!m_buckets[i].isEmpty())
-			{
-				for (List<Entry>::Iterator itr(m_buckets[i].getRoot()); itr.isValid(); ++itr)
-				{
-					if (auto node = itr.getNode())
-					{
+			if (!HM::m_buckets[i].isEmpty())
+				for (ListIterator itr(HM::m_buckets[i].getRoot()); itr.isValid(); ++itr)
+					if (ListNode* node = itr.getNode())
 						if (Value val = node->getData().getValue())
-							StandardRefCountPolicy<Value>::Decrement(val);
-					}
-				}
-			}
-		}
-		HashMap<Key, Value, HashPolicy>::clear();
+							StandardRefCountPolicy<Value>::decrement(val);
+		HM::clear();
 	}
 };
 

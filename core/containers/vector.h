@@ -7,6 +7,7 @@
 #define __VECTOR__
 
 	#include <assert.h>
+	#include "defines.h"
 	#include "shared_object.h"
 	#include "core/traits.h"
 
@@ -18,7 +19,7 @@ template <class T>	struct AutoVectorPolicy
 static	void			onInit(T* data, int size)
 		{
 			for (int i = 0; i < size; ++i)
-				data[i] = 0;
+				data[i] = null_ptr;
 		}
 
 static	void			onPush(T p) {}
@@ -41,14 +42,14 @@ template <class T>	struct SharedVectorPolicy
 	static void			onInit(T* data, int size)
 	{
 		for (int i = 0; i < size; ++i)
-			data[i] = 0;
+			data[i] = null_ptr;
 	}
 
 	static void			onPush(T p)
-	{	assert(p); p->IncRef();	}
+	{	assert(p); p->incRef();	}
 
 	static void			onPull(T p)
-	{	assert(p); p->DecRef();	}
+	{	assert(p); p->decRef();	}
 
 	static void			onClear(T* data, int size)
 	{
@@ -93,7 +94,7 @@ protected:
 public:
 
 		Vector()
-			: m_data(0)
+			: m_data(null_ptr)
 			, m_size(0)
 			, m_capacity(DefCapacity)
 			, is_t_ptr(IsPointer<T>::val)
@@ -102,7 +103,7 @@ public:
 		}
 
 		Vector(const int size)
-			: m_data(0)
+			: m_data(null_ptr)
 			, m_size(size)
 			, m_capacity(size > DefCapacity ? size + DefCapacity : DefCapacity)
 			, is_t_ptr(IsPointer<T>::val)
@@ -187,7 +188,7 @@ public:
 
 			delete [] m_data;
 			m_data = tmp;
-			tmp = 0;
+			tmp = null_ptr;
 			
 			return true;
 		}
@@ -202,14 +203,14 @@ public:
 		const int		GetCapacity() const
 		{	return m_capacity;	}
 		
-		const bool		IsNull() const
-		{	return m_data == 0;	}
+		const bool		Isnull_ptr() const
+		{	return m_data == null_ptr;	}
 
 		void			Clear()
 		{
 			LifetimePolicy<T>::onClear(m_data, m_size);
 			delete [] m_data;
-			m_data = 0;
+			m_data = null_ptr;
 			m_size = 0;
 			m_capacity = DefCapacity;
 		}

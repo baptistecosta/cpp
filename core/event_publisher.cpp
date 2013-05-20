@@ -5,8 +5,9 @@
 
 	#include <glfw.h>
 	#include <assert.h>
-	#include "event_publisher.h"
 	#include "defines.h"
+	#include "typedefs.h"
+	#include "event_publisher.h"
 	#include "keymap.h"
 
 using namespace owl;

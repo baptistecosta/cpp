@@ -4,7 +4,7 @@
 */
 
 	#include "glew.h"
-	#include "..\externs\wglext\wglext.h"
+	#include "externs/opengl/inc/GL/wglext.h"
 	#include "vsync.h"
 
 using namespace owl;
