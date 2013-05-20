@@ -4,12 +4,10 @@
 */
 
 	#include "hash_table.h"
-	#include "core\str_helper.h"
+	#include "core/string.h"
 
 using namespace owl;
 
 //-----------------------------------------------------------------------------
 unsigned long int StringHasher::process(const String& str)
-{
-	return StringTools::hash(str.cStr());
-}
+{	return StringTools::Hash(str.cStr());	}

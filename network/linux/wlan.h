@@ -4,6 +4,31 @@
 	#include <vector>
 	#include "externs/wireless_tools/iwlib.h"
 
+class	Interface
+{
+		int				sockfd;
+		const char*		ifname;
+
+public:
+
+		Interface(const char* ifname);
+		~Interface();
+
+		int				GetIndex();
+		short int		GetFlags();
+		sockaddr		GetHardwareAddress();
+
+		short int		SetFlags(short int value);
+		bool			SetToMonitorMode();
+
+		bool			Bind(const sockaddr*);
+
+		void			LogFlagsInfo(short int flags);
+
+		int				GetSocketFileDescriptor() const		{	return sockfd;	}
+		const char*		GetInterfaceName() const			{	return ifname;	}
+};
+
 //!
 struct AccessPoint
 {

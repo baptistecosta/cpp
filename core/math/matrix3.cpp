@@ -101,7 +101,7 @@ Matrix3			Matrix3::FromEuler(const float x, const float y, const float z, Rotati
 			return Matrix3	(	c_y * c_z + s_x * s_y * s_z,	c_x * s_z,	-c_z * s_y + c_y * s_x * s_z,
 								c_z * s_x * s_y - c_y * s_z,	c_x * c_z,	c_y * c_z * s_x + s_y * s_z,
 								c_x * s_y,						-s_x,		c_x * c_y	);
-	}	
+	}
 }
 
 //-----------------------------------------------------------------------------

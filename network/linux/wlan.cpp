@@ -6,6 +6,168 @@
 	using namespace std;
 
 //-----------------------------------------------------------------------------
+Interface::Interface(const char* _ifname) : ifname(_ifname)
+{
+//	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	sockfd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+	if (sockfd < 0)
+	{
+		printf("iw_sockets_open() failed!");
+		exit(-1);
+	}
+}
+
+//-----------------------------------------------------------------------------
+Interface::~Interface()
+{
+	close(sockfd);
+}
+
+//-----------------------------------------------------------------------------
+int				Interface::GetIndex()
+{
+	ifreq ifr;
+	memset(&ifr, 0, sizeof(ifr));
+	strncpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name) - 1);
+
+	if (ioctl(sockfd, SIOCGIFINDEX, &ifr) < 0)
+	{
+		Log::e("ioctl(SIOCGIFINDEX) failed!");
+		return -1;
+	}
+	return ifr.ifr_ifindex;
+}
+
+//-----------------------------------------------------------------------------
+sockaddr		Interface::GetHardwareAddress()
+{
+	ifreq ifr;
+	memset(&ifr, 0, sizeof(ifr));
+	strncpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name) - 1);
+
+	sockaddr addr;
+	if (ioctl(sockfd, SIOCGIFHWADDR, &ifr) < 0)
+		Log::e("ioctl(SIOCGIFHWADDR) failed!");
+	else
+	{
+		addr = ifr.ifr_hwaddr;
+
+		Log::i("Hardware address data: %s", addr.sa_data);
+		if		(addr.sa_family == ARPHRD_IEEE80211)
+			Log::i("Hardware address family: ARPHRD_IEEE80211", addr.sa_family);
+		else if (addr.sa_family == ARPHRD_IEEE80211_PRISM)
+			Log::i("Hardware address family: ARPHRD_IEEE80211_PRISM", addr.sa_family);
+		else if (addr.sa_family == ARPHRD_IEEE80211_RADIOTAP)
+			Log::i("Hardware address family: ARPHRD_IEEE80211_RADIOTAP", addr.sa_family);
+	}
+	return addr;
+}
+
+//-----------------------------------------------------------------------------
+short int		Interface::GetFlags()
+{
+	ifreq req;
+	strncpy(req.ifr_name, ifname, sizeof(req.ifr_name) - 1);
+
+	// Get flags state
+ 	if (ioctl(sockfd, SIOCGIFFLAGS, &req) == -1)
+ 	{
+ 		Log::e("SetFlags: ioctl() SIOCGIFFLAGS request failed!");
+		return -1;
+ 	}
+ 	return req.ifr_flags;
+}
+
+//-----------------------------------------------------------------------------
+short int		Interface::SetFlags(short int value)
+{
+ 	short int flags = GetFlags();
+
+	if (value < 0)
+	{
+		value = -value;
+		flags &= ~value;	// Remove flag	--> AND + FLIP_BITS
+	}
+	else
+		flags |= value;		// Add flag		-->	OR
+
+	ifreq req;
+	strncpy(req.ifr_name, ifname, sizeof(req.ifr_name) - 1);
+	req.ifr_flags = flags;
+	if (ioctl(sockfd, SIOCSIFFLAGS, &req) == -1)
+ 	{
+ 		Log::e("SetInterfaceFlags: ioctl() SIOCGIFFLAGS request failed!");
+		return -1;
+ 	}
+	return flags;
+}
+
+//-----------------------------------------------------------------------------
+// Monitor mode lets you listen to all transmissions on a given RF channel,
+// regardless of which AP it's coming from, and without associating to an access point.
+bool			Interface::SetToMonitorMode()
+{
+	iwreq wrq;
+	wrq.u.mode = IW_MODE_MONITOR;
+
+	if (iw_set_ext(sockfd, ifname, SIOCSIWMODE, &wrq) < 0)
+	{
+		switch (errno)
+		{
+			case EBUSY:
+				Log::e("Device or resource busy");
+				break;
+			default:
+				Log::e("iw_set_ext() failed with SIOCSIWMODE request %d!", errno);
+				break;
+		}
+		return false;
+	}
+	Log::i("%s interface set to monitor mode", ifname);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Bind the raw socket to the interface
+bool			Interface::Bind(const sockaddr* addr)
+{
+	if (bind(sockfd, addr, sizeof(addr)) < 0)
+	{
+		Log::e( "bind(ETH_P_ALL) failed" );
+		return false;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+void			Interface::LogFlagsInfo(short int flags)
+{
+	if (flags == -1)
+	{
+		Log::e("Interface flags == -1!");
+		return;
+	}
+ 	Log::Flat("Flags: ");
+ 	Log::Binary(&flags, sizeof(flags));
+ 	Log::i("Interface is %s.", flags & IFF_UP ? "up" : "down");
+ 	if (flags & IFF_BROADCAST) Log::i("Broadcast address valid.");
+ 	if (flags & IFF_DEBUG) Log::i("Turn on debugging.");
+ 	if (flags & IFF_LOOPBACK) Log::i("Is a loopback net.");
+ 	if (flags & IFF_POINTOPOINT) Log::i("Interface is point-to-point link.");
+ 	if (flags & IFF_NOTRAILERS) Log::i("Avoid use of trailers.");
+ 	if (flags & IFF_RUNNING) Log::i("Resources allocated.");
+ 	if (flags & IFF_NOARP) Log::i("No address resolution protocol(ARP).");
+ 	if (flags & IFF_PROMISC) Log::i("Receive all packets.");
+ 	if (flags & IFF_ALLMULTI) Log::i("Receive all multicast packets.");
+ 	if (flags & IFF_MASTER) Log::i("Master of a load balancer.");
+ 	if (flags & IFF_SLAVE) Log::i("Slave of a load balancer.");
+ 	if (flags & IFF_MULTICAST) Log::i("Supports multicast.");
+ 	if (flags & IFF_PORTSEL) Log::i("Can set media type.");
+ 	if (flags & IFF_AUTOMEDIA) Log::i("Auto media select active.");
+ 	if (flags & IFF_DYNAMIC) Log::i("Dialup device with changing addresses.");
+}
+
+//-----------------------------------------------------------------------------
 AccessPoint::AccessPoint() : signal_level(0), signal_noise(0)
 {
 	memset(bssid, 0, sizeof(bssid));

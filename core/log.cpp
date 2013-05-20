@@ -130,6 +130,25 @@ void			Log::Hex(const unsigned char* data, int len, FILE* f)
 }
 
 //-----------------------------------------------------------------------------
+// Little endian
+void			Log::Binary(const void* const ptr, const size_t len)
+{
+	unsigned char* b = (unsigned char*)ptr;
+	for (unsigned int i = 0; i < len; i++)
+	{
+		Log::Flat("Byte %03d: ", i);
+		for (int j = 7; j >= 0; --j)
+		{
+			unsigned char byte = b[i] & (1<<j);
+			byte >>= j;
+			Log::Flat("%u", byte);
+		}
+		Log::NewLine();
+	}
+	Log::NewLine();
+}
+
+//-----------------------------------------------------------------------------
 void			Log::HorizontalLine()
 {	if (Log::log) Print("\n===============================================================\n");	}
 //-----------------------------------------------------------------------------
@@ -142,6 +161,6 @@ void			Log::Print(const char* out)
 #ifdef _WIN32
 		OutputDebugStringA(out);
 #elif __linux
-		printf(out);
+		printf("%s", out);
 #endif
 }

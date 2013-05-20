@@ -32,6 +32,7 @@ static	void			Flat(const char* format, ...);
 
 static	void			Tee(FILE* f, const char* format, ...);
 static	void			Hex(const unsigned char* data, int len, FILE*);
+static	void			Binary(const void* const ptr, size_t const size);
 
 		// Horizontal line
 static	void			HorizontalLine();

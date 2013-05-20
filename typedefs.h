@@ -11,6 +11,7 @@ namespace owl {
 typedef		unsigned long				ulong;
 typedef		unsigned int				uint;
 typedef		unsigned long int			ulint;
+typedef		unsigned long long			ullong;
 typedef		unsigned short				ushort;
 typedef		unsigned char				uchar;
 

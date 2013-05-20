@@ -6,6 +6,8 @@
 #ifndef __LIST__
 #define __LIST__
 
+	#include "defines.h"
+
 namespace owl {
 
 //!
@@ -15,7 +17,7 @@ public:
 	//!
 	class	Node
 	{
-		friend			List<T>;
+		friend			class List<T>;
 
 		T				m_data;
 		Node*			m_next, *m_prev;
@@ -23,9 +25,9 @@ public:
 	public:
 	
 		Node(const T& data)
-			:	m_data(data)
-			,	m_next(null_ptr)
-			,	m_prev(null_ptr)
+			: m_data(data)
+			, m_next(null_ptr)
+			, m_prev(null_ptr)
 		{
 			//
 		}
@@ -275,9 +277,11 @@ public:
 };
 
 //!
-template<class T> class SharedList :	public	List<T>
+template<class T> class SharedList : public List<T>
 {
 public:
+
+	typedef	typename List<T>::Node	Node;
 
 	virtual	~SharedList()
 	{	clear();	}
@@ -303,7 +307,7 @@ public:
 		if (!node)
 			return false;
 
-		T data = node->getData()
+		T data = node->GetData();
 		if (!List<T>::remove(node))
 			return false;
 		if (data)
@@ -319,7 +323,7 @@ public:
 
 	virtual	void			clear()
 	{
-		for (Node* node = m_root; node; node = node->getNext())
+		for (Node* node = List<T>::m_root; node; node = node->getNext())
 			node->getData()->decRef();
 		List<T>::clear();
 	}

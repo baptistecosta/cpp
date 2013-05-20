@@ -7,6 +7,7 @@
 #define __ARRAY__
 
 	#include "defines.h"
+	#include "typedefs.h"
 
 namespace owl {
 

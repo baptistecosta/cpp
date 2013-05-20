@@ -1,0 +1,64 @@
+#ifndef __WLAN_RADIOTAP__
+#define __WLAN_RADIOTAP__
+
+#include <string.h>
+
+struct	RadiotapHeader
+{
+	struct	Present
+	{
+		unsigned			TSFT 				:1,	// byte 0
+							flags				:1,
+							rate				:1,
+							channel				:1,
+							FHSS				:1,
+							dBm_antenna_signal	:1,
+							dBm_antenna_noise	:1,
+							lock_quality		:1,
+
+							TX_attenuation		:1,	// byte 8
+							dB_TX_atteuation	:1,
+							dBm_TX_power		:1,
+							antenna				:1,
+							dB_antenna_signal	:1,
+							dB_antenna_noise	:1,
+							RX_flags			:1,
+												:1,
+
+												:2,	// byte 16
+							channel_plus		:1,
+							HT_info				:1,
+												:4,
+
+												:5,	// byte 24
+							radiotap_NS_next	:1,
+							vendor_NS_next		:1,
+							ext					:1;
+	};
+
+	struct	Flags
+	{
+		unsigned			CFP 				:1;
+		unsigned			preamble			:1;
+		unsigned			WEP					:1;
+		unsigned			fragmentation		:1;
+		unsigned			FCS_at_end			:1;
+		unsigned			data_pad			:1;
+		unsigned			bad_FCS				:1;
+		unsigned			short_GI			:1;
+	};
+
+	unsigned char			version,
+							pad;
+	unsigned short int		len;
+	Present					present;
+	unsigned long long int	timestamp;
+	Flags					flags;
+
+	RadiotapHeader()
+	{
+		memset(this, 0, sizeof(*this));
+	}
+};
+
+#endif	//	__WLAN_RADIOTAP__
