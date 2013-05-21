@@ -18,12 +18,12 @@ class	ShaderLoader
 {
 private:
 
-static	int				m_compilation_res,
-						m_info_log_len;
+static	int				compilation_res,
+						info_log_len;
 
 public:
 
-static	Shader*			Load(Shader::Type type, const String& vert_shader_path, const String& frag_shader_path);
+static	Shader*			Load(Shader::Type, const String& vert_shader_path, const String& frag_shader_path);
 
 private:
 
@@ -32,5 +32,5 @@ static	uint			LinkProgram(const uint vert_shader_id, const uint frag_shader_id);
 static	void			LogGLInfo(uint id);
 };
 
-}		// owl
-#endif	// __SHADER_LOADER__
+}		//	owl
+#endif	//	__SHADER_LOADER__

@@ -22,7 +22,7 @@ struct	Vertex;
 //!
 struct	SkinningJoints
 {
-		int				j[MAX_BONES_PER_VERT];
+		int						j[MAX_BONES_PER_VERT];
 		
 		SkinningJoints(Vertex::Weights weights[MAX_BONES_PER_VERT])
 		{
@@ -34,7 +34,7 @@ struct	SkinningJoints
 //!
 struct	SkinningWeights
 {
-		float			w[MAX_BONES_PER_VERT];
+		float					w[MAX_BONES_PER_VERT];
 		
 		SkinningWeights(Vertex::Weights weights[MAX_BONES_PER_VERT])
 		{
@@ -65,23 +65,25 @@ protected:
 		enum
 		{	NofBuffers		=	8	};
 
-		uint					m_buffer[NofBuffers];
-		RenderingVertices		m_vertices;
+		uint					buffer[NofBuffers];
+		RenderingVertices		vertices;
 
 public:
 
 		RenderingGeometry(const String& guid);
 		~RenderingGeometry();
 
-		uint&					getBuffer(uint index)		{	return m_buffer[index];	}
-		RenderingVertices&		getVertices()				{	return m_vertices;	}
-const	RenderingVertices&		getVertices() const			{	return m_vertices;	}
+		void					Bind();
+
+		uint&					GetBuffer(uint index)		{	return buffer[index];	}
+		RenderingVertices&		GetVertices()				{	return vertices;	}
+		const RenderingVertices& GetVertices() const		{	return vertices;	}
 };
 
 //!
 struct RenderingGeometriesLib
 {
-static	void					load(GLRenderer& renderer);
+static	void					Load(GLRenderer& renderer);
 };
 
 }		// owl

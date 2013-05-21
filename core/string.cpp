@@ -113,15 +113,15 @@ bool			StringTools::CaseCmp(const char* a, const char* b)
 //-----------------------------------------------------------------------------
 String			StringTools::Format(const char* str_format, va_list varg)
 {
-	char buff[4096];
-	memset(buff, 0, sizeof(buff));
-#ifdef _WIN_32
-	vsnprintf_s(buff, sizeof(buff), _TRUNCATE, str_format, varg);
+	char buf[4096];
+	memset(buf, 0, sizeof(buf));
+#ifdef _WIN32
+	vsnprintf_s(buf, sizeof(buf), _TRUNCATE, str_format, varg);
 #elif __linux
-	vsnprintf(buff, sizeof(buff), str_format, varg);
+	vsnprintf(buf, sizeof(buf), str_format, varg);
 #endif
 
-	return String(buff);
+	return String(buf);
 }
 
 //-----------------------------------------------------------------------------
@@ -360,7 +360,7 @@ String			String::Format(const char* str_format, ...)
 
 	char buff[4096];
 	memset(buff, 0, sizeof(buff));
-#ifdef _WIN_32
+#ifdef _WIN32
 	vsnprintf_s(buff, sizeof(buff), _TRUNCATE, str_format, varg);
 #elif __linux
 	vsnprintf(buff, sizeof(buff), str_format, varg);

@@ -40,11 +40,10 @@ class	Geometry:	public Resource
 {
 public:
 
-		Vector<Vertex*>		vertices;
+		AutoVector<Vertex>::type vertices;
 		bool				is_skinned;
 	
 		Geometry			(String& _guid);
-		~Geometry			();
 	
 		void				ComputeTangentBasis();
 };

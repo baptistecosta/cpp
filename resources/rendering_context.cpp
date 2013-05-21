@@ -4,12 +4,11 @@
 */
 
 	#include <assert.h>
-	#include "glew.h"
-	#include "opengl.h"
-	#include "opengl_renderer.h"
+	#include "graphics_wrappers/opengl.h"
+	#include "graphics_wrappers/opengl_renderer.h"
+	#include "resources/shader.h"
+	#include "resources/text2d.h"
 	#include "rendering_context.h"
-	#include "resources\shader.h"
-	#include "resources\text2d.h"
 		
 	using namespace owl;
 
@@ -33,9 +32,9 @@ RenderingContext::RenderingContext()
 //-----------------------------------------------------------------------------
 void			RenderingContext::Draw(Shader& shader, GLRenderer& gl_renderer)
 {
-	__GL_CALL(glUseProgram(shader.getProgram()))
+	__GL_CALL(glUseProgram(shader.GetProgram()))
 	
-	shader.setUniforms(*this);
+	shader.SetUniforms(*this);
 	gl_renderer.Draw(shader, *this);
 }
 
@@ -59,13 +58,12 @@ void			RenderingContext::DrawText(Shader& shd, GLRenderer& gl_renderer)
 }
 
 //-----------------------------------------------------------------------------
-Light&			RenderingContext::getLight(const int i)
+Light&			RenderingContext::GetLight(const int i)
 {
 	assert(i >= 0 && i < lights->Size());
 	return *(*lights)[i];
 }
 
-
 //-----------------------------------------------------------------------------
 void			RenderingContext::UseProgram(const Shader& s)
-{	__GL_CALL(glUseProgram(s.getProgram()))	}
+{	__GL_CALL(glUseProgram(s.GetProgram()))	}

@@ -6,6 +6,7 @@
 #ifndef __SPOT_LIGHT__
 #define __SPOT_LIGHT__
 
+	#include "core/math/vector.h"
 	#include "light.h"
 
 namespace owl {

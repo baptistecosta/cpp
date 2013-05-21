@@ -3,9 +3,8 @@
 	@author		Baptiste Costa
 */
 
-	#include <glfw.h>
 	#include <assert.h>
-	#include "defines.h"
+	#include "externs/opengl/inc/glfw.h"
 	#include "typedefs.h"
 	#include "event_publisher.h"
 	#include "keymap.h"

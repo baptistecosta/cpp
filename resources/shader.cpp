@@ -3,16 +3,15 @@
 	@author		Baptiste Costa
 */
 
-	#include "glew.h"
+	#include "graphics_wrappers/opengl.h"
 	#include "shader.h"
 	#include "shader_loader.h"
-	#include "rendering/opengl.h"
-	#include "rendering/camera.h"
-	#include "rendering/directional_light.h"
-	#include "rendering/point_light.h"
-	#include "rendering/spot_light.h"
-	#include "rendering/rendering_context.h"
-	#include "resources/resource_manager.h"
+	#include "camera.h"
+	#include "directional_light.h"
+	#include "point_light.h"
+	#include "rendering_context.h"
+	#include "resource_manager.h"
+	#include "spot_light.h"
 
 	using namespace owl;
 
@@ -31,10 +30,10 @@ Shader::~Shader()
 }
 
 //-----------------------------------------------------------------------------
-void			Shader::initUniformsBundles(RenderingContext& context)
+void			Shader::InitUniformsBundles(RenderingContext& context)
 {
-	assert(!context.getLights().IsNull());
-	const int n_lights = context.getLights().Size();
+	assert(!context.GetLights().IsNull());
+	const int n_lights = context.GetLights().Size();
 	switch (m_type)
 	{
 		case Shader::Text2D:
@@ -51,13 +50,13 @@ void			Shader::initUniformsBundles(RenderingContext& context)
 			m_uniform_bundles.Push(new MatricesUniforms);
 			m_uniform_bundles.Push(new LightsCountUniform);
 			for (int i = 0; i < n_lights; i++)
-				m_uniform_bundles.Push(LightUniformsFactory::Create(context.getLight(i), i));
+				m_uniform_bundles.Push(LightUniformsFactory::Create(context.GetLight(i), i));
 			break;
 	}
 }
 
 //-----------------------------------------------------------------------------
-void			Shader::getUniformLocations()
+void			Shader::GetUniformLocations()
 {
 	int size = m_uniform_bundles.Size();
 	for (int i = 0; i < size; i++)
@@ -65,7 +64,7 @@ void			Shader::getUniformLocations()
 }
 
 //-----------------------------------------------------------------------------
-void			Shader::setUniforms(RenderingContext& context)
+void			Shader::SetUniforms(RenderingContext& context)
 {
 	int size = m_uniform_bundles.Size();
 	for (int i = 0; i < size; i++)
@@ -99,12 +98,12 @@ void			ShaderLib::Load(RenderingContext& context)
 		const char* name = Shader::GetShaderNameFromType(type);
 
 		Log::HorizontalLine();
-		Log::i("Loading shader: %s", name);
+		__LOG("Loading shader: %s", name);
 		Shader* shd = ShaderLoader::Load(type, String::Format("%s%s.vert", dir, name), String::Format("%s%s.frag", dir, name));
 		assert(shd);
 
-		shd->initUniformsBundles(context);
-		shd->getUniformLocations();
+		shd->InitUniformsBundles(context);
+		shd->GetUniformLocations();
 		shaders.Push(shd);
 		Log::i("Successfully load shader: %s", name);
 	}
@@ -116,65 +115,3 @@ Shader*			ShaderLib::Get(Shader::Type type)
 	assert(type >= Shader::Text2D && type < Shader::ShaderCount);
 	return shaders[type];
 }
-
-/*
-//-----------------------------------------------------------------------------
-BaseShaderLoader::BaseShaderLoader(RenderingContext& context)
-	:	m_type(Shader::InvalidShader)
-	,	m_context(context)
-{
-	//
-}
-
-//-----------------------------------------------------------------------------
-Shader*			BaseShaderLoader::load()
-{
-	assert(m_type != Shader::InvalidShader);
-	assert(!m_vertex_shader_path.isEmpty());
-	assert(!m_fragment_shader_path.isEmpty());
-
-	Shader* shader = ShaderLoader::load(m_type, m_vertex_shader_path, m_fragment_shader_path);
-	assert(shader);
-	shader->initUniformsBundles(m_context);
-	shader->getUniformLocations();
-
-	return shader;
-}
-
-//-----------------------------------------------------------------------------
-Shader*			Text2DShaderLoader::load()
-{
-	m_type = Shader::Text2D;
-	m_vertex_shader_path = "resources/shaders/text2d.vert";
-	m_fragment_shader_path = "resources/shaders/text2d.frag";
-
-	return BaseShaderLoader::load();
-}
-//-----------------------------------------------------------------------------
-Shader*			FlatShaderLoader::load()
-{
-	m_type = Shader::Flat;
-	m_vertex_shader_path = "resources/shaders/flat.vert";
-	m_fragment_shader_path = "resources/shaders/flat.frag";
-
-	return BaseShaderLoader::load();
-}
-//-----------------------------------------------------------------------------
-Shader*			PhongShaderLoader::load()
-{
-	m_type = Shader::Phong;
-	m_vertex_shader_path = "resources/shaders/phong.vert";
-	m_fragment_shader_path = "resources/shaders/phong.frag";
-
-	return BaseShaderLoader::load();
-}
-//-----------------------------------------------------------------------------
-Shader*			NormalMapShaderLoader::load()
-{
-	m_type = Shader::NormalMap;
-	m_vertex_shader_path = "resources/shaders/normalmap.vert";
-	m_fragment_shader_path = "resources/shaders/normalmap.frag";
-
-	return BaseShaderLoader::load();
-}
-*/

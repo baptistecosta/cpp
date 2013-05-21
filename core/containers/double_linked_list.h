@@ -19,9 +19,9 @@ template<class T> class	DLNode
 public:
 
 		DLNode()
-			:	m_data(null_ptr)
-			,	m_next(null_ptr)
-			,	m_prev(null_ptr)
+			:	m_data(0)
+			,	m_next(0)
+			,	m_prev(0)
 		{
 			//
 		}
@@ -87,8 +87,8 @@ public:
 public:
 
 		DoubleLinkedList()
-			:	m_head(null_ptr)
-			,	m_tail(null_ptr)
+			:	m_head(0)
+			,	m_tail(0)
 			,	m_size(0)
 		{
 			//
@@ -116,8 +116,8 @@ public:
 			{
 				m_head = m_tail = new DLNode<T>;
 				m_head->setData(data);
-				m_head->setNext(null_ptr);
-				m_head->setPrev(null_ptr);
+				m_head->setNext(0);
+				m_head->setPrev(0);
 			}
 			else
 			{
@@ -134,8 +134,8 @@ public:
 			{
 				m_head = m_tail = createNode();
 				m_head->setData(data);
-				m_head->setNext(null_ptr);
-				m_head->setPrev(null_ptr);
+				m_head->setNext(0);
+				m_head->setPrev(0);
 			}
 			else
 			{
@@ -148,7 +148,7 @@ public:
 		//!	Removes the very first node in the list.
 		void				removeHead()
 		{
-			DLNode<T>* node = null_ptr;
+			DLNode<T>* node = 0;
 
 			if (m_head)
 			{
@@ -157,9 +157,9 @@ public:
 				m_head = node;
 
 				if (!m_head)
-					m_tail = null_ptr;
+					m_tail = 0;
 				else
-					m_head->setPrev(null_ptr);
+					m_head->setPrev(0);
 
 				m_size--;
 			}
@@ -168,7 +168,7 @@ public:
 		//!	Removes the very last node in the list.
 		void				removeTail()
 		{
-			DLNode<T>* node = null_ptr;
+			DLNode<T>* node = 0;
 
 			if (m_tail)
 			{
@@ -178,9 +178,9 @@ public:
 				m_tail = node;
 
 				if (!m_tail)
-					m_head = null_ptr;
+					m_head = 0;
 				else
-					m_tail->setNext(null_ptr);
+					m_tail->setNext(0);
 
 				m_size--;
 			}
@@ -260,7 +260,7 @@ template<class T> class DoubleLinkedList_Iterator
 		DLNode<T>*			m_node;
 
 public:
-		Iterator(DoubleLinkedList<T>* list = null_ptr, DLNode<T>* node = null_ptr)
+		Iterator(DoubleLinkedList<T>* list = 0, DLNode<T>* node = 0)
 			:	m_list(list)
 			,	m_node(m_node)
 		{

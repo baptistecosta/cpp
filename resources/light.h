@@ -7,12 +7,12 @@
 #define __LIGHT__
 
 	#include <vector>	
-	#include "color.h"
 	#include "core/containers/auto_array.h"
 	#include "core/containers/shared_pointer.h"
 	#include "core/containers/vector.h"
 	#include "core/event_listener.h"
 	#include "typedefs.h"
+	#include "color.h"
 
 namespace owl {
 

@@ -14,9 +14,9 @@
 	#include "obj_loader.h"
 	#include "object.h"
 	#include "picture.h"
+	#include "rendering_geometry.h"
 	#include "text2d.h"
 	#include "core/containers/hash_table.h"
-	#include "rendering\rendering_geometry.h"
 
 namespace owl {
 

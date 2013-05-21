@@ -18,7 +18,7 @@ namespace owl {
 //!
 struct	StringHasher
 {
-static	unsigned long int process(const String& str);
+static	unsigned long int Process(const String& str);
 };
 
 //!
@@ -157,7 +157,7 @@ public:
 	const Array<List<Entry> >& getBuckets() const
 	{	return m_buckets;	}
 	const int		getBucketIndex(const Key& key) const
-	{	return HashPolicy::process(key) % m_capacity;	}
+	{	return HashPolicy::Process(key) % m_capacity;	}
 
 	const int		getSize() const
 	{	return m_size;	}
@@ -191,7 +191,7 @@ public:
 			return;
 
 		HashMap<Key, Value, HashPolicy>::insert(key, val);
-		StandardRefCountPolicy<Value>::increment(val);
+		StandardRefCountPolicy<Value>::Increment(val);
 	}
 
 	virtual	bool	remove(const Key& key)
@@ -201,7 +201,7 @@ public:
 			Value val = entry->getValue();
 			if (!remove(key))
 				return false;
-			StandardRefCountPolicy<Value>::decrement(val);
+			StandardRefCountPolicy<Value>::Decrement(val);
 			return true;
 		}
 		return false;
@@ -215,7 +215,7 @@ public:
 				for (ListIterator itr(HM::m_buckets[i].getRoot()); itr.isValid(); ++itr)
 					if (ListNode* node = itr.getNode())
 						if (Value val = node->getData().getValue())
-							StandardRefCountPolicy<Value>::decrement(val);
+							StandardRefCountPolicy<Value>::Decrement(val);
 		HM::clear();
 	}
 };

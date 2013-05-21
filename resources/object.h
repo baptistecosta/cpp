@@ -7,9 +7,9 @@
 #define __OBJECT__
 
 	#include "picture.h"
-	#include "core\math\vector.h"
-	#include "core\math\matrix4.h"
-	
+	#include "core/math/vector.h"
+	#include "core/math/matrix4.h"
+
 namespace owl {
 
 class	Mesh;

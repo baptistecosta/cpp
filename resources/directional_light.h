@@ -5,6 +5,7 @@
 #ifndef __DIRECTIONAL_LIGHT__
 #define __DIRECTIONAL_LIGHT__
 
+	#include "core/math/vector.h"
 	#include "light.h"
 
 namespace owl {

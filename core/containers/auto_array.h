@@ -51,7 +51,7 @@ public:
 		//---------------------------------------------------------------------
 		T&					operator []	(int index)
 		{	return m_data[index];	}
-const	T&					operator []	(int index) const
+		const T&			operator []	(int index) const
 		{	return m_data[index];	}
 
 
@@ -117,16 +117,16 @@ public:
 		}
 
 		//---------------------------------------------------------------------
-const	int					size() const
+		const int			size() const
 		{	return m_size;	}
-const	int					capacity() const
+		const int			capacity() const
 		{	return m_capacity;	}
 
 
 		//---------------------------------------------------------------------
-const	bool				isNull() const
+		const bool			isNull() const
 		{	return m_data == 0;	}
-const	bool				isNull(int i) const
+		const bool			isNull(int i) const
 		{
 			if (isNull() || i >= m_capacity)
 				return true;
@@ -146,5 +146,5 @@ const	bool				isNull(int i) const
 		}
 };
 
-}		// owl
-#endif	// __B_AUTO_ARRAY__
+}		//	owl
+#endif	//	__B_AUTO_ARRAY__

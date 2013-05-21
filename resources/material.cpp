@@ -33,10 +33,10 @@ Material&		Material::operator = (const Material& mtl)
 //-----------------------------------------------------------------------------
 const void		Material::log()
 {
-	Log::horizontalLine();
+	Log::HorizontalLine();
 	Log::i("Material name: %s", m_guid);
 	Log::i("Ka: %d, Kd: %d, Ks %d, Ns %f", m_Ka, m_Kd, m_Ks, m_Ns);
-	Log::newLine();
+	Log::NewLine();
 }
 
 //-----------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 #ifndef __POINT_LIGHT__
 #define __POINT_LIGHT__
 
+	#include "core/math/vector.h"
 	#include "light.h"
 
 namespace owl {
@@ -22,11 +23,11 @@ public:
 
 		PointLight		(	const PointLight& l	);
 		PointLight		(
-							const Vector3& pos = Vector3::origin
-						,	const float range = 25.f
-						,	const Color& La = Color::Black
-						,	const Color& Ld = Color::Sunlight
-						,	const Color& Ls = Color::Skyoc
+							const Vector3& pos = Vector3::origin,
+							const float range = 25.f,
+							const Color& La = Color::Black,
+							const Color& Ld = Color::Sunlight,
+							const Color& Ls = Color::Skyoc
 						);
 
 		void				init();

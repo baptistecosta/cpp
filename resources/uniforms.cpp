@@ -4,27 +4,25 @@
 */
 
 	#include <assert.h>
-	#include "glew.h"
+	#include <vector>
+	#include "core/math/matrix4.h"
+	#include "core/string.h"
+	#include "core/log.h"
+	#include "externs/opengl/inc/glew.h"
+	#include "graphics_wrappers/opengl.h"
+	#include "rendering_context.h"
+	#include "material.h"
 	#include "uniforms.h"
 	#include "color.h"
 	#include "light.h"
 	#include "directional_light.h"
-	#include "opengl.h"
 	#include "point_light.h"
 	#include "spot_light.h"
-	#include "rendering_context.h"
-	#include "core\string.h"
-	#include "core\log.h"
-	#include "resources\material.h"
-	
-using namespace owl;
+
+	using namespace owl;
 
 //-----------------------------------------------------------------------------
-UniformWrapper::UniformWrapper()
-	:	m_uniform_location(0)
-{
-	//
-}
+UniformWrapper::UniformWrapper(): m_uniform_location(0) {}
 
 //-----------------------------------------------------------------------------
 void			UniformWrapper::GetUniformLocation(const uint shader_program, const String& uniform_var_name)
@@ -33,7 +31,7 @@ void			UniformWrapper::GetUniformLocation(const uint shader_program, const Strin
 	m_uniform_location = glGetUniformLocation(shader_program, uniform_var_name.cStr());
 	OpenGL::CheckGLError();
 	if (Log::log && m_uniform_location == -1)
-		Log::w("Shader program: %d, glGetUniformLocation returned -1 for uniform variable name: %s", shader_program, uniform_var_name);
+		Log::i("Shader program: %d, glGetUniformLocation returned -1 for uniform variable name: %s", shader_program, uniform_var_name);
 }
 
 //-----------------------------------------------------------------------------
@@ -57,7 +55,7 @@ void			UniformWrapper::SetUniform(float vmtx[], uint count)
 {	if (m_uniform_location >= 0) __GL_CALL(glUniformMatrix4fv(m_uniform_location, count, GL_FALSE, &vmtx[0]))	}
 void			UniformWrapper::SetUniform(Matrix4 vmtx[], uint count)
 {	if (m_uniform_location >= 0) __GL_CALL(glUniformMatrix4fv(m_uniform_location, count, GL_FALSE, &vmtx[0].m[0]))	}
-void			UniformWrapper::SetUniform(vMatrix4& vmtx)
+void			UniformWrapper::SetUniform(std::vector<Matrix4>& vmtx)
 {	if (m_uniform_location >= 0) __GL_CALL(glUniformMatrix4fv(m_uniform_location, vmtx.size(), GL_FALSE, &vmtx[0].m[0]))	}
 
 //-----------------------------------------------------------------------------
@@ -72,10 +70,10 @@ void			MatricesUniforms::GetUniformLocation(const uint shader_program, const int
 //---------------------------------------------------------------------------
 void			MatricesUniforms::SetUniforms(RenderingContext& context)
 {
-	m_model.SetUniform(context.getModelMatrix());
-	m_view.SetUniform(context.getViewMatrix());
-	m_proj.SetUniform(context.getProjMatrix());
-	m_viewproj.SetUniform(context.getViewProjMatrix());
+	m_model.SetUniform(context.GetModelMatrix());
+	m_view.SetUniform(context.GetViewMatrix());
+	m_proj.SetUniform(context.GetProjMatrix());
+	m_viewproj.SetUniform(context.GetViewProjMatrix());
 }
 
 //---------------------------------------------------------------------------
@@ -90,10 +88,10 @@ void			MaterialsUniforms::GetUniformLocation(const uint program, const int index
 //---------------------------------------------------------------------------
 void			MaterialsUniforms::SetUniforms(RenderingContext& context)
 {
-	m_Ka.SetUniform(context.getMaterial().getKa());
-	m_Kd.SetUniform(context.getMaterial().getKd());
-	m_Ks.SetUniform(context.getMaterial().getKs());
-	m_Ns.SetUniform(context.getMaterial().getNs());
+	m_Ka.SetUniform(context.GetMaterial().getKa());
+	m_Kd.SetUniform(context.GetMaterial().getKd());
+	m_Ks.SetUniform(context.GetMaterial().getKs());
+	m_Ns.SetUniform(context.GetMaterial().getNs());
 }
 
 //-----------------------------------------------------------------------------
@@ -118,7 +116,7 @@ void			LightsCountUniform::GetUniformLocation(const uint program, const int inde
 
 //-----------------------------------------------------------------------------
 void			LightsCountUniform::SetUniforms(RenderingContext& context)
-{	m_count.SetUniform(context.getLights().Size());	}
+{	m_count.SetUniform(context.GetLights().Size());	}
 
 //-----------------------------------------------------------------------------
 void			LightUniforms::GetUniformLocation(const uint shader_program, const int i)
@@ -131,9 +129,9 @@ void			LightUniforms::GetUniformLocation(const uint shader_program, const int i)
 //-----------------------------------------------------------------------------
 void			LightUniforms::SetUniforms(RenderingContext& context)
 {
-	m_La.SetUniform(context.getLight(m_index).getLa());
-	m_Ld.SetUniform(context.getLight(m_index).getLd());
-	m_Ls.SetUniform(context.getLight(m_index).getLs());
+	m_La.SetUniform(context.GetLight(m_index).getLa());
+	m_Ld.SetUniform(context.GetLight(m_index).getLd());
+	m_Ls.SetUniform(context.GetLight(m_index).getLs());
 }
 
 //-----------------------------------------------------------------------------
@@ -150,7 +148,7 @@ void			DirectionalLightUniforms::SetUniforms(RenderingContext& context)
 {
 	LightUniforms::SetUniforms(context);
 
-	DirectionalLight* l = static_cast<DirectionalLight*>(&context.getLight(GetIndex()));
+	DirectionalLight* l = static_cast<DirectionalLight*>(&context.GetLight(GetIndex()));
 	m_type.SetUniform(static_cast<int>(Light::Directional));
 	m_dir.SetUniform(l->getDirection());
 }
@@ -170,7 +168,7 @@ void			PointLightUniforms::SetUniforms(RenderingContext& context)
 {
 	LightUniforms::SetUniforms(context);
 		
-	PointLight* l = static_cast<PointLight*>(&context.getLight(GetIndex()));
+	PointLight* l = static_cast<PointLight*>(&context.GetLight(GetIndex()));
 	m_type.SetUniform(static_cast<int>(Light::Point));
 	m_pos.SetUniform(l->GetPos());
 	m_range.SetUniform(l->getRange());
@@ -194,7 +192,7 @@ void			SpotLightUniforms::SetUniforms(RenderingContext& context)
 {
 	LightUniforms::SetUniforms(context);
 	
-	SpotLight* l = static_cast<SpotLight*>(&context.getLight(GetIndex()));
+	SpotLight* l = static_cast<SpotLight*>(&context.GetLight(GetIndex()));
 	m_type.SetUniform(static_cast<int>(Light::Spot));
 	m_pos.SetUniform(l->GetPos());
 	m_dir.SetUniform(l->GetDir());

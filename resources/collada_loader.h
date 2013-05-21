@@ -296,7 +296,7 @@ static	Collada			collada;
 //		//---------------------------------------------------------------------
 //		//							Collada tools
 //		//---------------------------------------------------------------------
-		bool				ExtractVector(char* v_ascii, Vector3&);
+//		bool				ExtractVector(char* v_ascii, Vector3&);
 		Vector3				ExtractVector(char* v_ascii);
 		bool				ExtractFloat(char* f_ascii, float&);
 		float				ExtractFloat(char* f_ascii);

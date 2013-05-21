@@ -6,7 +6,7 @@
 #ifndef __AUTO_PTR__
 #define __AUTO_PTR__
 
-	#include "defines.h"
+	#include "typedefs.h"
 
 namespace owl {
 

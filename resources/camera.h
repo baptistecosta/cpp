@@ -49,7 +49,7 @@ public:
 		Camera();
 		Camera(const Camera& camera);
 
-		void				UpdateAngleFromBlockedMousePosition();
+		void				UpdateAngleFromBlockedMousePosition(const Vector2& screen_res);
 		void				ComputeViewProjMatrices(const Vector2& mouse_pos = Vector2::origin);
 
 private:

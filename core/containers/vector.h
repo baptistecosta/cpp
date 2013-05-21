@@ -3,30 +3,30 @@
 	@author		Baptiste Costa
 */
 
-#ifndef __VECTOR__
-#define __VECTOR__
+#ifndef __CONTAINERS_VECTOR__
+#define __CONTAINERS_VECTOR__
 
 	#include <assert.h>
+	#include "core/traits.h"
 	#include "defines.h"
 	#include "shared_object.h"
-	#include "core/traits.h"
 
 namespace owl {
 
 //!
 template <class T>	struct AutoVectorPolicy
 {
-static	void			onInit(T* data, int size)
+static	void			OnInit(T* data, int size)
 		{
 			for (int i = 0; i < size; ++i)
 				data[i] = null_ptr;
 		}
 
-static	void			onPush(T p) {}
-static	void			onPull(T p)
+static	void			OnPush(T p) {}
+static	void			OnPull(T p)
 		{	delete p;	}
 
-static	void			onClear(T* data, int size)
+static	void			OnClear(T* data, int size)
 		{
 			for (int i = 0; i < size; ++i)
 			{
@@ -39,35 +39,35 @@ static	void			onClear(T* data, int size)
 //!
 template <class T>	struct SharedVectorPolicy
 {
-	static void			onInit(T* data, int size)
-	{
-		for (int i = 0; i < size; ++i)
-			data[i] = null_ptr;
-	}
-
-	static void			onPush(T p)
-	{	assert(p); p->incRef();	}
-
-	static void			onPull(T p)
-	{	assert(p); p->decRef();	}
-
-	static void			onClear(T* data, int size)
-	{
-		for (int i = 0; i < size; ++i)
+static	void			OnInit(T* data, int size)
 		{
-			assert(data[i]);
-			data[i]->decRef();
+			for (int i = 0; i < size; ++i)
+				data[i] = null_ptr;
 		}
-	}
+
+static	void			OnPush(T p)
+		{	assert(p); p->IncRef();	}
+
+static	void			OnPull(T p)
+		{	assert(p); p->DecRef();	}
+
+static	void			OnClear(T* data, int size)
+		{
+			for (int i = 0; i < size; ++i)
+			{
+				assert(data[i]);
+				data[i]->DecRef();
+			}
+		}
 };
 
 //!
 template <class T>	struct StandardVectorPolicy
 {
-static	void			onInit(T* data, int size) {}
-static	void			onPush(T p) {}
-static	void			onPull(T p) {}
-static	void			onClear(T* data, int size) {}
+static	void			OnInit(T* data, int size) {}
+static	void			OnPush(T p) {}
+static	void			OnPull(T p) {}
+static	void			OnClear(T* data, int size) {}
 };
 
 //!
@@ -137,7 +137,7 @@ private:
 			{
 				for (int i = 0; i < m_capacity; ++i)
 					m_data[i] = 0;
-				LifetimePolicy<T>::onInit(m_data, count);
+				LifetimePolicy<T>::OnInit(m_data, count);
 				return true;
 			}
 			return false;
@@ -159,14 +159,14 @@ public:
 					return false;
 
 			m_data[m_size++] = item;
-			LifetimePolicy<T>::onPush(item);
+			LifetimePolicy<T>::OnPush(item);
 
 			return true;
 		}
 
 		void			Pull()
 		{
-			LifetimePolicy<T>::onPull(m_data[m_size - 1]);
+			LifetimePolicy<T>::OnPull(m_data[m_size - 1]);
 			--m_size;
 		}
 
@@ -178,7 +178,7 @@ public:
 			if (!tmp)
 				return false;
 
-			LifetimePolicy<T>::onInit(tmp, new_capacity);
+			LifetimePolicy<T>::OnInit(tmp, new_capacity);
 
 			for (int i = 0; i < m_size ; i++)
 				tmp[i] = m_data[i];
@@ -203,12 +203,12 @@ public:
 		const int		GetCapacity() const
 		{	return m_capacity;	}
 		
-		const bool		Isnull_ptr() const
+		const bool		IsNull() const
 		{	return m_data == null_ptr;	}
 
 		void			Clear()
 		{
-			LifetimePolicy<T>::onClear(m_data, m_size);
+			LifetimePolicy<T>::OnClear(m_data, m_size);
 			delete [] m_data;
 			m_data = null_ptr;
 			m_size = 0;
@@ -221,4 +221,4 @@ template <class T>	struct AutoVector	{	typedef	Vector<T*, AutoVectorPolicy>	type
 template <class T>	struct SharedVector	{	typedef	Vector<T*, SharedVectorPolicy>	type;	};
 
 }		// owl
-#endif	// __VECTOR__
+#endif	// __CONTAINERS_VECTOR__

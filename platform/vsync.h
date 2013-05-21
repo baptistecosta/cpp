@@ -8,10 +8,10 @@
 
 namespace owl {
 
-//! @struct	VSync
+//!
 struct	VSync
 {
-static	void			enable(bool b);
+static	void			Enable(bool b);
 };
 
 }		// owl

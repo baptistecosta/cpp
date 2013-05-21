@@ -6,7 +6,7 @@
 #ifndef __SHADOW_MAP_FBO__
 #define __SHADOW_MAP_FBO__
 
-	#include "platform\defines.h"
+	#include "typedefs.h"
 
 namespace owl {
 

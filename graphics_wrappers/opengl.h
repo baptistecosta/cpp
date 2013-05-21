@@ -6,6 +6,8 @@
 #ifndef __OPENGL__
 #define __OPENGL__
 
+	#include "externs/opengl/inc/glew.h"
+	#include "externs/opengl/inc/glfw.h"
 	#include "typedefs.h"
 
 #if _DEBUG
@@ -19,6 +21,7 @@ namespace owl {
 class	Picture;
 class	RenderingGeometry;
 class	Text2D;
+class	Vector2;
 
 //!
 struct	OpenGL
@@ -37,8 +40,8 @@ struct	OpenGL
 			Texture_9	=	0x84C9
 		};
 
-		void			Init();
-		void			InitGlfw();
+		void			Init(const Vector2& screen_res);
+		void			InitGlfw(const Vector2& screen_res);
 		void			InitGlew();
 
 		void			ClearScreen();
@@ -46,11 +49,12 @@ struct	OpenGL
 
 		bool			Exit();
 		void			CleanUp();
-
+/*
 static	void			Bind3DGeometry(RenderingGeometry* rdr_geom);
 static	void			Bind2DTextGeometry(Text2D& rdr_txt_geom);
+*/
 static	void			CreateGLBuffer(void* data, size_t size, uint& buffer, uint usage/* = GL_STATIC_DRAW*/);
-static	void			GenerateTexture(Picture& picture);
+static	uint			GenerateTexture();
 static	void			BindTexture(uint gl_texture_unit, const uint& GLuint_named_texture);
 static	void			CheckGLError();
 };

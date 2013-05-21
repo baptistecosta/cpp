@@ -5,9 +5,9 @@
 
 	#include "camera.h"
 	#include <glfw.h>
-	#include "core\string.h"
-	#include "..\platform\framerate.h"
-	#include "..\platform\keymap.h"
+	#include "core/framerate.h"
+	#include "core/keymap.h"
+	#include "core/string.h"
 
 	using namespace owl;
 	using namespace owl::math;
@@ -43,13 +43,13 @@ Camera::Camera(const Camera& camera)
 }
 
 //-----------------------------------------------------------------------------
-void			Camera::UpdateAngleFromBlockedMousePosition()
+void			Camera::UpdateAngleFromBlockedMousePosition(const Vector2& screen_res)
 {
-	glfwSetMousePos(static_cast<int>(ScreenResolution_W * 0.5f), static_cast<int>(ScreenResolution_H * 0.5f));
+	glfwSetMousePos(static_cast<int>(screen_res.x * 0.5f), static_cast<int>(screen_res.y * 0.5f));
 
 	float sf = FrameRate::framerate.GetSpeedFactor();
-	m_hQ += orientation_speed * sf * (ScreenResolution_W * 0.5f - mouse_x);
-	m_vQ -= orientation_speed * sf * (ScreenResolution_H * 0.5f - mouse_y);
+	m_hQ += orientation_speed * sf * (screen_res.x * 0.5f - mouse_x);
+	m_vQ -= orientation_speed * sf * (screen_res.y * 0.5f - mouse_y);
 }
 
 //-----------------------------------------------------------------------------

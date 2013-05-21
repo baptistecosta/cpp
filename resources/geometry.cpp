@@ -4,13 +4,13 @@
 */
 	
 	#include <map>
+	#include "core/containers/stl.h"
+	#include "core/log.h"
 	#include "geometry.h"
 	#include "obj_loader.h"
 	#include "resource_manager.h"
-	#include "core\log.h"
-	#include "platform\path_manager.h"
 
-using	namespace owl;
+	using namespace owl;
 
 //-----------------------------------------------------------------------------
 Vertex::Vertex(const Vector3& _pos, const Vector3& _nor, const Vector2& _uv)
@@ -18,19 +18,15 @@ Vertex::Vertex(const Vector3& _pos, const Vector3& _nor, const Vector2& _uv)
 
 
 //-----------------------------------------------------------------------------
-Geometry::Geometry(String& _guid)
-	:	Resource(_guid)
-	,	is_skinned(false)
+Geometry::Geometry(String& _guid):
+	Resource(_guid),
+	is_skinned(false)
 {}
-
-//-----------------------------------------------------------------------------
-Geometry::~Geometry()
-{	Stl::DeleteVector(vertices);	}
 
 //-----------------------------------------------------------------------------
 void			Geometry::ComputeTangentBasis()
 {
-	for (uint i = 0; i < vertices.size(); i += 3)
+	for (int i = 0; i < vertices.Size(); i += 3)
 	{
 		Vector3& v0 = vertices[i]->pos;
 		Vector3& v1 = vertices[i + 1]->pos;
@@ -70,7 +66,7 @@ void			GeometriesLib::load()
 // 	ObjLoader::load(PathManager::get("obj_joint"));
 // 	ObjLoader::load(PathManager::get("obj_suzan"));
 
-	Log::horizontalLine(); Log::i("Loading geometries...");
+	Log::HorizontalLine(); Log::i("Loading geometries...");
 	ObjLoader loader;
 	loader.Load(String("resources/meshes/cave.obj"));
 	loader.Load(String("resources/meshes/floor.obj"));

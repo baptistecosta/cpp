@@ -4,15 +4,14 @@
 */
 
 	#include <assert.h>
-	#include "glew.h"
+	#include "core/log.h"
+	#include "resources/material.h"
+	#include "resources/text2d.h"
+	#include "resources/shader.h"
+	#include "resources/rendering_context.h"
+	#include "resources/rendering_geometry.h"
 	#include "opengl.h"
 	#include "opengl_renderer.h"
-	#include "rendering_context.h"
-	#include "rendering_geometry.h"
-	#include "core\log.h"
-	#include "resources\material.h"
-	#include "resources\text2d.h"
-	#include "resources\shader.h"
 
 	using namespace owl;
 	using namespace owl::math;
@@ -20,52 +19,52 @@
 //-----------------------------------------------------------------------------
 void			GLRenderer::Draw(Shader& shader, RenderingContext& context)
 {
-	__GL_CALL(glUseProgram(shader.getProgram()))
+	__GL_CALL(glUseProgram(shader.GetProgram()))
 
-	shader.setUniforms(context);
+	shader.SetUniforms(context);
 
-	RenderingGeometry& rg = context.getRenderingGeometry();
-	BindArrayBufferAndAttribPointer(rg.getBuffer(0), 0, 3, GL_FLOAT);
-	BindArrayBufferAndAttribPointer(rg.getBuffer(1), 1, 2, GL_FLOAT);
-	BindArrayBufferAndAttribPointer(rg.getBuffer(2), 2, 3, GL_FLOAT);
-	BindArrayBufferAndAttribPointer(rg.getBuffer(3), 3, 3, GL_FLOAT);
-	BindArrayBufferAndAttribPointer(rg.getBuffer(4), 4, 3, GL_FLOAT);
-	BindArrayBufferAndAttribIPointer(rg.getBuffer(5), 5, 4, GL_INT);
-	BindArrayBufferAndAttribPointer(rg.getBuffer(6), 6, 4, GL_FLOAT);
-	BindAndDrawElement(rg.getBuffer(7), 7, GL_TRIANGLES, rg.getVertices().indices.size(), GL_UNSIGNED_SHORT);
+	RenderingGeometry& rg = context.GetRenderingGeometry();
+	BindArrayBufferAndAttribPointer(rg.GetBuffer(0), 0, 3, GL_FLOAT);
+	BindArrayBufferAndAttribPointer(rg.GetBuffer(1), 1, 2, GL_FLOAT);
+	BindArrayBufferAndAttribPointer(rg.GetBuffer(2), 2, 3, GL_FLOAT);
+	BindArrayBufferAndAttribPointer(rg.GetBuffer(3), 3, 3, GL_FLOAT);
+	BindArrayBufferAndAttribPointer(rg.GetBuffer(4), 4, 3, GL_FLOAT);
+	BindArrayBufferAndAttribIPointer(rg.GetBuffer(5), 5, 4, GL_INT);
+	BindArrayBufferAndAttribPointer(rg.GetBuffer(6), 6, 4, GL_FLOAT);
+	BindAndDrawElement(rg.GetBuffer(7), 7, GL_TRIANGLES, rg.GetVertices().indices.size(), GL_UNSIGNED_SHORT);
 
 	// Disable vertex attrib arrays.
 	int n_buff = Max3DBuffer - 1;
 	for (int i = 0; i < n_buff; i++)
-		if (rg.getBuffer(i))
+		if (rg.GetBuffer(i))
 			__GL_CALL(glDisableVertexAttribArray(i))
 }
 
 //-----------------------------------------------------------------------------
 void			GLRenderer::DrawLines(RenderingGeometry* rg)
 {
-	BindArrayBufferAndAttribPointer(rg->getBuffer(0), 0, 3, GL_FLOAT);
-	__GL_CALL(glDrawArrays(GL_LINES, 0, rg->getVertices().pos.size()))
+	BindArrayBufferAndAttribPointer(rg->GetBuffer(0), 0, 3, GL_FLOAT);
+	__GL_CALL(glDrawArrays(GL_LINES, 0, rg->GetVertices().pos.size()))
 }
 
 //-----------------------------------------------------------------------------
 void			GLRenderer::DrawText(Shader& shader, RenderingContext& context)
 {
-	__GL_CALL(glUseProgram(shader.getProgram()))
+	__GL_CALL(glUseProgram(shader.GetProgram()))
 
-	Text2D& text_2d = context.getText2D();
- 	OpenGL::BindTexture(text_2d.getFont()->m_texture->GetGLTextureName(), GL_TEXTURE0);
- 	OpenGL::Bind2DTextGeometry(text_2d);
+	Text2D& text_2d = context.GetText2D();
+ 	OpenGL::BindTexture(text_2d.GetFont()->m_texture->GetGLTextureName(), GL_TEXTURE0);
+	text_2d.Bind();
 
 	context.SetTextureUnit(0);
-	shader.setUniforms(context);
+	shader.SetUniforms(context);
  	
-	BindArrayBufferAndAttribPointer(text_2d.getBuffer(0), 0, 2, GL_FLOAT);
-	BindArrayBufferAndAttribPointer(text_2d.getBuffer(1), 1, 2, GL_FLOAT);
+	BindArrayBufferAndAttribPointer(text_2d.GetBuffer(0), 0, 2, GL_FLOAT);
+	BindArrayBufferAndAttribPointer(text_2d.GetBuffer(1), 1, 2, GL_FLOAT);
 
 	__GL_CALL(glEnable(GL_BLEND))
 	__GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA))
-	__GL_CALL(glDrawArrays(GL_TRIANGLES, 0, text_2d.getSize()))
+	__GL_CALL(glDrawArrays(GL_TRIANGLES, 0, text_2d.GetSize()))
 	__GL_CALL(glDisable(GL_BLEND))
 
 	for (int i = 0; i < Max2DBuffer; i++)
@@ -108,12 +107,12 @@ void			GLRenderer::BindAndDrawElement(uint buffer, uint index, uint mode, int co
 //-----------------------------------------------------------------------------
 RenderingGeometry* GLRenderer::ConvertToRenderingGeometry(Geometry* geom)
 {
-	uint size = geom->vertices.size();
+	uint size = geom->vertices.Size();
 	if (size == 0)
 		return null_ptr;
 
 	RenderingGeometry* rdr_geom = new RenderingGeometry(geom->getGuid());
-	RenderingVertices* rdr_vert = &rdr_geom->getVertices();
+	RenderingVertices* rdr_vert = &rdr_geom->GetVertices();
 
 	uint index = 0;
 	for (uint i = 0; i < size; i++)

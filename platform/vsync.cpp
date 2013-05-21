@@ -3,14 +3,14 @@
 	@author		Baptiste Costa
 */
 
-	#include "glew.h"
+	#include "externs/opengl/inc/glew.h"
 	#include "externs/opengl/inc/GL/wglext.h"
 	#include "vsync.h"
 
-using namespace owl;
+	using namespace owl;
 
 //-----------------------------------------------------------------------------
-void			VSync::enable(bool b)
+void			VSync::Enable(bool b)
 {
 	typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 	PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;

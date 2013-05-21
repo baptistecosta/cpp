@@ -107,8 +107,8 @@ void	Collada::LoadVisualScenes(xml_node<>* cnod_collada, Scene* scene)
 //---------------------------------------------------------------------------
 void			Collada::LoadVisualScenePolygon( xml_node<>* cnod_collada, xml_node<>* cnod_node, VecTRS* node_geom )
 {
-	if (xml_node<>* cnod_transf = FindNode(cnod_node, "translate")) ExtractVector(cnod_transf->value(), node_geom->t);
-	if (xml_node<>* cnod_transf = FindNode(cnod_node, "scale")) ExtractVector(cnod_transf->value(), node_geom->s);
+	if (xml_node<>* cnod_transf = FindNode(cnod_node, "translate")) node_geom->t = ExtractVector(cnod_transf->value());
+	if (xml_node<>* cnod_transf = FindNode(cnod_node, "scale")) node_geom->s = ExtractVector(cnod_transf->value());
 	if (xml_node<>* cnod_transf = FindNode(cnod_node, "rotate", "sid", "rotateX")) ExtractRotation(cnod_transf->value(), node_geom->r.x);
 	if (xml_node<>* cnod_transf = FindNode(cnod_node, "rotate", "sid", "rotateY")) ExtractRotation(cnod_transf->value(), node_geom->r.y);
 	if (xml_node<>* cnod_transf = FindNode(cnod_node, "rotate", "sid", "rotateZ")) ExtractRotation(cnod_transf->value(), node_geom->r.z);
@@ -159,8 +159,8 @@ void			Collada::ExtractVisualSceneJointData(xml_node<>* cnod, Tree<VisualScene::
 	{
 		String sid = node->first_attribute("sid")->value();
 
-		if		(sid == "translate")	ExtractVector(node->value(), tree_node->getTreeData().bind_pose.t);
-		else if (sid == "scale")		ExtractVector(node->value(), tree_node->getTreeData().bind_pose.s);
+		if		(sid == "translate")	tree_node->getTreeData().bind_pose.t = ExtractVector(node->value());
+		else if (sid == "scale")		tree_node->getTreeData().bind_pose.s = ExtractVector(node->value());
 		else if (sid == "jointOrientX")	ExtractRotation(node->value(), tree_node->getTreeData().bind_pose.o.x);
 		else if (sid == "jointOrientY")	ExtractRotation(node->value(), tree_node->getTreeData().bind_pose.o.y);
 		else if (sid == "jointOrientZ")	ExtractRotation(node->value(), tree_node->getTreeData().bind_pose.o.z);
@@ -221,7 +221,7 @@ Geometry*		Collada::LoadGeometry(xml_node<>* cnod_collada, xml_node<>* cnod_geom
 		Vector3 nor(mesh.source_nor[mesh.triangles.p[i * 3 + mesh.triangles.nor_offset]]);
 		Vector2 uv(mesh.source_uv[mesh.triangles.p[i * 3 + mesh.triangles.texcoord_offset]]);
 
-		geom->vertices.push_back(new Vertex(pos, nor, uv));
+		geom->vertices.Push(new Vertex(pos, nor, uv));
 
 		uint p_index = mesh.triangles.p[i * 3 + mesh.triangles.vert_offset];
 		
@@ -251,14 +251,14 @@ xml_node<>*		Collada::FindNode(xml_node<>* search_location, const char* tag_name
 	{
 		for (xml_node<>* child = search_location->first_node(tag_name); child; child = child->next_sibling(tag_name))
 		{
-			if (attrib_name == null_str) return child;
+			if (attrib_name == 0) return child;
 
-			else if (attrib_name != null_str && attrib_value == null_str)
+			else if (attrib_name != 0 && attrib_value == 0)
 			{
 				if (child->first_attribute(attrib_name))
 					return child;
 			}
-			else if (attrib_name != null_str && attrib_value != null_str)
+			else if (attrib_name != 0 && attrib_value != 0)
 			{
 				if (strcmp(child->first_attribute(attrib_name)->value(), attrib_value) == 0)
 					return child;
@@ -307,7 +307,7 @@ Controller*		Collada::LoadControllers(xml_node<>* cnod_collada, xml_node<>* cnod
 
 	vector<string> str_joints_name(controller->accessor_joints.count);
 	istringstream iss(str_joints);
-	for (uint i = 0; i < controller->accessor_joints.count; i++)
+	for (int i = 0; i < controller->accessor_joints.count; i++)
 		iss >> str_joints_name[i];
 
 	// Node <source> for inverse bind matrices
@@ -319,13 +319,13 @@ Controller*		Collada::LoadControllers(xml_node<>* cnod_collada, xml_node<>* cnod
 
 	String str_input_weight_accessor = cnod_input_weight->first_attribute("source")->value();
 	String str_source_weights_data = AccessSourceData(cnod_ctrl, controller->accessor_weights,str_input_weight_accessor, "float_array");
-	vFloat weights = ExtractVectorFloat(str_source_weights_data);
+	std::vector<float> weights = ExtractVectorFloat(str_source_weights_data);
 
 	// Node <vertex_weights>
 	uint v_weight_count = atoi(node_v_weights->first_attribute("count")->value());
 
-	vUint vcount = ExtractVectorInt(node_v_weights->first_node("vcount")->value());
-	vUint v = ExtractVectorInt(node_v_weights->first_node("v")->value());
+	std::vector<uint> vcount = ExtractVectorInt(node_v_weights->first_node("vcount")->value());
+	std::vector<uint> v = ExtractVectorInt(node_v_weights->first_node("v")->value());
 
 	uint current_v_index = 0;
 	for (uint i = 0; i < v_weight_count; i++)
@@ -417,8 +417,8 @@ void			Collada::LoadAnimations(xml_node<>* cnod_lib_anims)
 
 		size_t len_to_slash = str_channel_target.find("/");
 
-		char str_channel_joint_target[48] = null_str;
-		char str_channel_transf_target[48] = null_str;
+		char str_channel_joint_target[48] = {0};
+		char str_channel_transf_target[48] = {0};
 		str_channel_target.copy(str_channel_joint_target, len_to_slash, 0);
 		str_channel_target.copy(str_channel_transf_target, str_channel_target.length() - len_to_slash, len_to_slash);
 
@@ -436,8 +436,8 @@ void			Collada::LoadAnimations(xml_node<>* cnod_lib_anims)
 		xml_node<>* cnod_anim_source_input_data = AccessNode(cnod_anim_source_input_accessor, "source", cnod_anim_source_input, "float_array", "id");
 		xml_node<>* cnod_anim_source_output_data = AccessNode(cnod_anim_source_output_accessor, "source", cnod_anim_source_output, "float_array", "id");
 
-		vFloat input_vector_float = ExtractVectorFloat(cnod_anim_source_input_data->value());
-		vFloat output_vector_float = ExtractVectorFloat(cnod_anim_source_output_data->value());
+		std::vector<float> input_vector_float = ExtractVectorFloat(cnod_anim_source_input_data->value());
+		std::vector<float> output_vector_float = ExtractVectorFloat(cnod_anim_source_output_data->value());
 		
 		// Create enough animations in the joint so they can store animation data.
 		if (joint->animations.size() == 0)
@@ -484,11 +484,11 @@ VisualScene::Joint*	Collada::FindJoint(const String& name, Tree<VisualScene::Joi
 		if (find_in_child)
 			return find_in_child;
 	}
-	return null_ptr;
+	return 0;
 }
 
 //---------------------------------------------------------------------------
-bool			Collada::ExtractVertexData(char* v_ascii, vVec3& v_float)
+bool			Collada::ExtractVertexData(char* v_ascii, std::vector<Vector3>& v_float)
 {
 	v_ascii = RemoveNewlineAndSpaceBeforeString(v_ascii);
 	while (v_ascii[0] != 0 && v_ascii[1] != 0)
@@ -510,7 +510,7 @@ bool			Collada::ExtractVertexData(char* v_ascii, vVec3& v_float)
 }
 
 //---------------------------------------------------------------------------
-bool			Collada::ExtractVertexUV(char* v_ascii, vVec2& v)
+bool			Collada::ExtractVertexUV(char* v_ascii, std::vector<Vector2>& v)
 {
 	v_ascii = RemoveNewlineAndSpaceBeforeString(v_ascii);
 	while (v_ascii[0] != 0 && v_ascii[1] != 0)
@@ -528,7 +528,7 @@ bool			Collada::ExtractVertexUV(char* v_ascii, vVec2& v)
 }
 
 //---------------------------------------------------------------------------
-vUint			Collada::ExtractVectorInt(String& str)
+vector<uint>	Collada::ExtractVectorInt(String& str)
 {
 //	vector<char> vn_ascii(str.size() + 1);
 	vector<char> vn_ascii(str.Size() + 1);
@@ -537,7 +537,7 @@ vUint			Collada::ExtractVectorInt(String& str)
 	char* n_ascii = &vn_ascii[0];
 	n_ascii = RemoveNewlineAndSpaceBeforeString(n_ascii);
 
-	vUint v;
+	vector<uint> v;
 	while (n_ascii[0] != 0)
 	{
 		v.push_back(atoi(&n_ascii[0]));
@@ -547,10 +547,10 @@ vUint			Collada::ExtractVectorInt(String& str)
 }
 
 //---------------------------------------------------------------------------
-vUint			Collada::ExtractVectorInt(char* n_ascii)
+vector<uint>	Collada::ExtractVectorInt(char* n_ascii)
 {
 	n_ascii = RemoveNewlineAndSpaceBeforeString(n_ascii);
-	vUint v;
+	vector<uint> v;
 	while (n_ascii[0] != 0)
 	{
 		v.push_back(atoi(&n_ascii[0]));
@@ -560,7 +560,7 @@ vUint			Collada::ExtractVectorInt(char* n_ascii)
 }
 
 //---------------------------------------------------------------------------
-vFloat			Collada::ExtractVectorFloat(const String& str)
+std::vector<float> Collada::ExtractVectorFloat(const String& str)
 {
 //	vector<char> vn_ascii(str.size() + 1);
 	vector<char> vn_ascii(str.Size() + 1);
@@ -568,7 +568,7 @@ vFloat			Collada::ExtractVectorFloat(const String& str)
 	char* n_ascii = &vn_ascii[0];
 	n_ascii = RemoveNewlineAndSpaceBeforeString(n_ascii);
 
-	vFloat v;
+	std::vector<float> v;
 	while (n_ascii[0] != 0)
 	{
 		v.push_back(static_cast<float>(atof(&n_ascii[0])));
@@ -677,7 +677,7 @@ owl::Matrix4	Collada::ExtractMatrix(char* mtx_ascii)
 }
 
 //---------------------------------------------------------------------------
-vMatrix4		Collada::ExtractMatrices(String str, int count, int stride)
+std::vector<Matrix4> Collada::ExtractMatrices(String str, int count, int stride)
 {
 //	vector<char> vmtx_ascii(str.size() + 1);
 	vector<char> vmtx_ascii(str.Size() + 1);
@@ -685,13 +685,15 @@ vMatrix4		Collada::ExtractMatrices(String str, int count, int stride)
 	char* mtx_ascii = &vmtx_ascii[0];
 	mtx_ascii = RemoveNewlineAndSpaceBeforeString(mtx_ascii);
 
-	vMatrix4 mtx(count);
-	for (uint i = 0; i < count; i++)
-		for (uint j = 0; j < stride; j++)
+	std::vector<Matrix4> mtx(count);
+	for (int i = 0; i < count; i++)
+	{
+		for (int j = 0; j < stride; j++)
 		{
 			mtx[i].m[j] = static_cast<float>(atof(mtx_ascii));
 			mtx_ascii = JumpToNextChar(mtx_ascii, 32 /*space*/);
 		}
+	}
 	return mtx;
 }
 

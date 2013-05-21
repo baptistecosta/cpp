@@ -6,11 +6,11 @@
 #ifndef __RENDERING_CONTEXT__
 #define __RENDERING_CONTEXT__
 
-	#include "light.h"
-	#include "typedefs.h"
 	#include "core/containers/auto_array.h"
 	#include "core/containers/vector.h"
 	#include "resources/material.h"
+	#include "resources/light.h"
+	#include "typedefs.h"
 
 namespace owl {
 
@@ -47,17 +47,17 @@ public:
 		void					Draw(Shader&, GLRenderer&);
 		void					DrawText(Shader&, GLRenderer&);
 
-		const Matrix4&			getModelMatrix() const							{	return *model_mtx;	}
-		const Matrix4&			getProjMatrix() const							{	return *proj_mtx;	}
-		const Matrix4&			getViewMatrix() const							{	return *view_mtx;	}
-		const Matrix4&			getViewProjMatrix() const						{	return *viewproj_mtx;	}
-		const Material&			getMaterial() const								{	return *material;	}
+		const Matrix4&			GetModelMatrix() const							{	return *model_mtx;	}
+		const Matrix4&			GetProjMatrix() const							{	return *proj_mtx;	}
+		const Matrix4&			GetViewMatrix() const							{	return *view_mtx;	}
+		const Matrix4&			GetViewProjMatrix() const						{	return *viewproj_mtx;	}
+		const Material&			GetMaterial() const								{	return *material;	}
 		int						GetTextureUnit()								{	return texture_unit;	}
 		int						GetNormalMapUnit()								{	return normal_map_unit;	}
-		Light&					getLight(const int i);
-		const Lights&			getLights() const								{	return *lights;	}
-		RenderingGeometry&		getRenderingGeometry() const					{	return *rd_geom;	}
-		Text2D&					getText2D() const								{	return *text_2d;	}
+		Light&					GetLight(const int i);
+		const Lights&			GetLights() const								{	return *lights;	}
+		RenderingGeometry&		GetRenderingGeometry() const					{	return *rd_geom;	}
+		Text2D&					GetText2D() const								{	return *text_2d;	}
 
 		void					SetModelMatrix(Matrix4* m)						{	model_mtx = m;	}
 		void					SetProjMatrix(Matrix4* m)						{	proj_mtx = m;	}
@@ -69,7 +69,7 @@ public:
 		void					SetLights(Lights* l)							{	lights = l;	}
 
 		void					SetRenderingGeometry(RenderingGeometry* rg)		{	rd_geom = rg;	}
-		void					setText2D(Text2D* t)							{	text_2d = t;	}
+		void					SetText2D(Text2D* t)							{	text_2d = t;	}
 };
 
 }		//	owl

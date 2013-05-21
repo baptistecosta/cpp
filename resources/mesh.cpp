@@ -11,9 +11,9 @@ using namespace owl;
 //-----------------------------------------------------------------------------
 Mesh::Mesh(const String& guid)
 	:	Resource(guid)
-	,	m_geometry(null_ptr)
-	,	m_rnd_geom(null_ptr)
-//	,	m_skeleton(null_ptr)
+	,	m_geometry(0)
+	,	m_rnd_geom(0)
+//	,	m_skeleton(0)
 {
 	//
 }

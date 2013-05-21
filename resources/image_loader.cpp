@@ -5,19 +5,19 @@
 
 #define STBI_HEADER_FILE_ONLY		//	Images loader library hack.
 
-	#include "image_loader.h"
-	#include "glew.h"
-	#include "glfw.h"
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
+	#include "core/log.h"
+	#include "externs/opengl/inc/glew.h"
+	#include "externs/opengl/inc/glfw.h"
+	#include "externs/stb_image/stb_image.c"
+	#include "graphics_wrappers/opengl.h"
+	#include "image_loader.h"
 	#include "picture.h"
 	#include "resource_manager.h"
-	#include "core\log.h"
-	#include "externs\stb_image\stb_image.c"
-	#include "renderer\opengl.h"
 	
-using	namespace owl;
+	using	namespace owl;
 
 //-----------------------------------------------------------------------------
 Picture*		ImageLoader::LoadBMP(const String& path)
@@ -36,11 +36,16 @@ Picture*		ImageLoader::LoadBMP(const String& path)
 	// Actual RGB data
 	uchar*	data;
 
-	FILE* f = fopen (path.cStr(), "rb");
+	FILE* f = fopen(path.cStr(), "rb");
 
-	if (!f) printf ("Image could not be opened.\n");
-	if (fread (header, 1, 54, f) != 54) printf ("Not a correct BMP file.\n");
-	if (header[0] != 'B' || header[1] != 'M') printf ("Not a correct BMP file.\n");
+	if (!f)
+		printf("Image could not be opened.\n");
+
+	if (fread(header, 1, 54, f) != 54)
+		printf("Not a correct BMP file.\n");
+
+	if (header[0] != 'B' || header[1] != 'M')
+		printf("Not a correct BMP file.\n");
 
 	data_pos	= *(int*)&(header[0x0A]);
 	image_size	= *(int*)&(header[0x22]);
@@ -196,17 +201,18 @@ Picture*		ImageLoader::LoadPNG(const String& path)
 	
 	switch (comp)
 	{
-	case STBI_grey:
-	case STBI_rgb:
-		comp = GL_RGB;
-		break;
-	case STBI_grey_alpha:
-	case STBI_rgb_alpha:
-		comp = GL_RGBA;
-		break;
+		case STBI_grey:
+		case STBI_rgb:
+			comp = GL_RGB;
+			break;
+		case STBI_grey_alpha:
+		case STBI_rgb_alpha:
+			comp = GL_RGBA;
+			break;
 	}
 
-	OpenGL::GenerateTexture(*p);
+	p->SetGLTextureName(OpenGL::GenerateTexture());
+//	OpenGL::GenerateTexture(*p);
 
 	// Définie l'unité de texture 0 comme courante. (optionnel, == par défaut)
 	__GL_CALL(glActiveTexture(GL_TEXTURE0))
@@ -260,7 +266,7 @@ void			ImagesLib::add(const String& path)
 //-----------------------------------------------------------------------------
 void			ImagesLib::load()
 {
-	Log::horizontalLine();
+	Log::HorizontalLine();
 	for (int i = 0; i < loaders.size(); i++)
 		loaders[i]->load();
 }

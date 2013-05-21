@@ -9,5 +9,5 @@
 using namespace owl;
 
 //-----------------------------------------------------------------------------
-unsigned long int StringHasher::process(const String& str)
-{	return StringTools::Hash(str.cStr());	}
+unsigned long int owl::StringHasher::Process(const String& str)
+{	return owl::StringTools::Hash(str.cStr());	}
