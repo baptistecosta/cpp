@@ -44,15 +44,15 @@ struct	Dump
 };
 
 #ifdef __debug__
-	#define	__LOG(_FORMAT_, ...)	Dump<LogPolicyLevelInfo>::Process(_FORMAT_, __VA_ARGS__);
-	#define	__LOG_E(_FORMAT_, ...)	Dump<LogPolicyLevelError>::Process(_FORMAT_, __VA_ARGS__);
-	#define	__LOG_W(_FORMAT_, ...)	Dump<LogPolicyLevelWarning>::Process(_FORMAT_, __VA_ARGS__);
-	#define __LOG_NL()				Dump<LogPolicyLevelInfo>::Process("");
+	#define	__LOG(_FORMAT_, ...)	{	Dump<LogPolicyLevelInfo>::Process(_FORMAT_, __VA_ARGS__);	}
+	#define	__LOG_E(_FORMAT_, ...)	{	Dump<LogPolicyLevelError>::Process(_FORMAT_, __VA_ARGS__);	}
+	#define	__LOG_W(_FORMAT_, ...)	{	Dump<LogPolicyLevelWarning>::Process(_FORMAT_, __VA_ARGS__);	}
+	#define __LOG_NL()				{	Dump<LogPolicyLevelInfo>::Process("");	}
 #else
-	#define	__LOG(_FORMAT_, ...)
-	#define	__LOG_E(_FORMAT_, ...)
-	#define	__LOG_W(_FORMAT_, ...)
-	#define __LOG_NL()
+	#define	__LOG(_FORMAT_, ...)	{	;	}
+	#define	__LOG_E(_FORMAT_, ...)	{	;	}
+	#define	__LOG_W(_FORMAT_, ...)	{	;	}
+	#define __LOG_NL()				{	;	}
 #endif
 
 //!
@@ -70,7 +70,7 @@ static	void			Flat(const String& msg);
 static	void			Flat(const char* format, ...);
 
 static	void			Tee(FILE* f, const char* format, ...);
-static	void			Hex(const unsigned char* data, int len, FILE*);
+static	void			Hex(const unsigned char* data, int len, FILE* = 0);
 static	void			Binary(const void* const ptr, size_t const size);
 
 		// Horizontal line

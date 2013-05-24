@@ -5,7 +5,6 @@
 	#include "typedefs.h"
 	#include "core/containers/vector.h"
 	#include "core/bin.h"
-	#include "core/log.h"
 
 namespace owl
 {

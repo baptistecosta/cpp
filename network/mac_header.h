@@ -20,29 +20,29 @@ struct	MACHeader
 		//!
 		enum	FieldsID
 		{
-			FID_FrameCtrl	=	0,
-			FID_DurationID,
-			FID_Addr1,
-			FID_Addr2,
-			FID_Addr3,
-			FID_SeqCtrl,
-			FID_Addr4,
-			FID_QoSControl,
-			FID_HTCtrl,
-			FID_FrameBody,
-			FID_FCS
+			FieldID_FrameCtrl	=	0,
+			FieldID_DurationID,
+			FieldID_Addr1,
+			FieldID_Addr2,
+			FieldID_Addr3,
+			FieldID_SeqCtrl,
+			FieldID_Addr4,
+			FieldID_QoSControl,
+			FieldID_HTCtrl,
+			FieldID_FrameBody,
+			FieldID_FCS
 		};
 		//!
 		enum	FieldsSize
 		{
-			FS_FrameCtrl		=	2,
-			FS_DurationID		=	2,
-			FS_Addr				=	6,
-			FS_SeqCtrl			=	2,
-			FS_QoSCtrl			=	2,
-			FS_HTCtrl			=	4,
-			FS_FrameBody		=	-1,
-			FS_FCS				=	4
+			FieldSize_FrameCtrl		=	2,
+			FieldSize_DurationID	=	2,
+			FieldSize_Addr			=	6,
+			FieldSize_SeqCtrl		=	2,
+			FieldSize_QoSCtrl		=	2,
+			FieldSize_HTCtrl		=	4,
+			FieldSize_FrameBody		=	-1,
+			FieldSize_FCS			=	4
 		};
 
 		//!
@@ -101,25 +101,38 @@ struct	MACHeader
 					Order				=	Flag_7
 				};
 
-				unsigned		version		:	2,
-								type		:	2,
-								subtype		:	4;
+				unsigned		version	:	2,
+								type	:	2,
+								subtype	:	4;
 				uchar			flags;
+
+				FrameControl() : version(0), type(0), subtype(0), flags(0) {}
 		};
-errno;
+
+		//!
+		struct	SequenceControl
+		{
+				unsigned		frag_num	:	4,
+								seq_num		:	12;
+
+				SequenceControl() : frag_num(0), seq_num(0) {}
+		};
+
 		//!
 		enum	FrameType
 		{	Management = 0, Control, Data	};
 
-		Vector<MACHeader::Field*> ff;
+		Vector<MACHeader::Field*> fields;
+		int				size;
+
 		uchar*			frame;
 
-		FrameControl*	fctrl;
+		FrameControl	frame_ctrl;
 		ushort*			duration_id;
 		uchar			addr_1[6],
 						addr_2[6],
 						addr_3[6];
-		ushort*			seq_ctrl;
+		SequenceControl	seq_ctrl;
 		uchar			addr_4[6];
 
 		uint*			fcs;

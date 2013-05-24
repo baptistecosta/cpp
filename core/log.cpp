@@ -57,7 +57,7 @@ void			Log::e(const char* format, ...)
 	{
 		va_list varg;
 		va_start(varg, format);
-		String str = String::Format(format, varg);
+		String str = StringTools::Format(format, varg);
 		String out = String::Format("Error: %s\n", str.cStr());
 		Print(out.cStr());
 		va_end(varg);
@@ -74,7 +74,7 @@ void			Log::Flat(const char* format, ...)
 	{
 		va_list varg;
 		va_start(varg, format);
-		String str = String::Format(format, varg);
+		String str = StringTools::Format(format, varg);
 		String out = String::Format("%s", str.cStr());
 		Print(out.cStr());
 		va_end(varg);
