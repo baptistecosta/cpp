@@ -3,7 +3,7 @@
 	@author		Baptiste Costa
 */
 
-	#include "graphics_wrappers/opengl.h"
+	#include "graphics/opengl.h"
 	#include "shader.h"
 	#include "shader_loader.h"
 	#include "camera.h"
@@ -86,7 +86,7 @@ const char*		Shader::GetShaderNameFromType(const Shader::Type type)
 }
 
 //-----------------------------------------------------------------------------
-void			ShaderLib::Load(RenderingContext& context)
+void			ShaderLib::Load(const char* path, RenderingContext& ctx)
 {
 	uint vert_shader_id = glCreateShader(GL_VERTEX_SHADER);
 	OpenGL::CheckGLError();
@@ -94,18 +94,16 @@ void			ShaderLib::Load(RenderingContext& context)
 	for (int i = 0; i < Shader::ShaderCount; i++)
 	{
 		Shader::Type type = static_cast<Shader::Type>(i);
-		const char* dir = "resources/shaders/";
 		const char* name = Shader::GetShaderNameFromType(type);
 
 		Log::HorizontalLine();
-		__LOG("Loading shader: %s", name);
-		Shader* shd = ShaderLoader::Load(type, String::Format("%s%s.vert", dir, name), String::Format("%s%s.frag", dir, name));
-		assert(shd);
+		__LOG("Loading shader: %s", name)
+		Shader* shd = ShaderLoader::Load(type, String::Format("%s%s.vert", path, name), String::Format("%s%s.frag", path, name));
 
-		shd->InitUniformsBundles(context);
+		shd->InitUniformsBundles(ctx);
 		shd->GetUniformLocations();
 		shaders.Push(shd);
-		Log::i("Successfully load shader: %s", name);
+		__LOG("Successfully load shader: %s", name)
 	}
 }
 

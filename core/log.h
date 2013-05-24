@@ -47,7 +47,7 @@ struct	Dump
 	#define	__LOG(_FORMAT_, ...)	Dump<LogPolicyLevelInfo>::Process(_FORMAT_, __VA_ARGS__);
 	#define	__LOG_E(_FORMAT_, ...)	Dump<LogPolicyLevelError>::Process(_FORMAT_, __VA_ARGS__);
 	#define	__LOG_W(_FORMAT_, ...)	Dump<LogPolicyLevelWarning>::Process(_FORMAT_, __VA_ARGS__);
-	#define __LOG_NL()				Dump<LogPolicyLevelWarning>::Process("");
+	#define __LOG_NL()				Dump<LogPolicyLevelInfo>::Process("");
 #else
 	#define	__LOG(_FORMAT_, ...)
 	#define	__LOG_E(_FORMAT_, ...)

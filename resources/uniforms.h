@@ -20,7 +20,6 @@ class	Light;
 class	Material;
 class	DirectionalLight;
 class	PointLight;
-class	SpotLight;
 
 class	RenderingContext;
 

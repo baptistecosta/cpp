@@ -26,14 +26,14 @@ public:
 
 		SpotLight		(	const SpotLight& l	);
 		SpotLight		(	
-							const Vector3& pos = Vector3(-5.f, 5.f, 5.f)
-						,	const Vector3& dir = Vector3(1.f, -1.f, -1.f)
-						,	const float range = 25.f
-						,	const float inner_q = 15.f
-						,	const float outer_q = 10.f
-						,	const Color& La = Color::Black
-						,	const Color& Ld = Color::Sunlight
-						,	const Color& Ls = Color::Skyoc
+							const Vector3& pos = Vector3(-5.f, 5.f, 5.f),
+							const Vector3& dir = Vector3(1.f, -1.f, -1.f),
+							const float range = 25.f,
+							const float inner_q = 15.f,
+							const float outer_q = 10.f,
+							const Color& La = Color::Black,
+							const Color& Ld = Color::Sunlight,
+							const Color& Ls = Color::Skyoc
 						);
 
 		void				Init();

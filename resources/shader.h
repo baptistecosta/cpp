@@ -69,8 +69,8 @@ class	ShaderLib
 
 public:
 
-		void				Load(RenderingContext& context);
-		Shader*				Get(Shader::Type type);
+		void				Load(const char* path, RenderingContext&);
+		Shader*				Get(Shader::Type);
 };
 
 }		// owl

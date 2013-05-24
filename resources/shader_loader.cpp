@@ -8,7 +8,7 @@
 	#include "core/string.h"
 	#include "core/log.h"
 	#include "core/filesys.h"
-	#include "graphics_wrappers/opengl.h"
+	#include "graphics/opengl.h"
 	#include "rendering_context.h"
 	#include "resource_manager.h"
 	#include "shader_loader.h"
@@ -22,42 +22,40 @@ int				ShaderLoader::info_log_len = 0;
 //-----------------------------------------------------------------------------
 Shader*			ShaderLoader::Load(Shader::Type type, const String& vshad_path, const String& fshad_path)
 {
-	FileSystem fs;
+	uint vs_id = 0, fs_id = 0;
+	String vs_src, fs_src;
 
-	// Vertex shader
-	if (!fs.Open(vshad_path))
+	CreateShader(GL_VERTEX_SHADER, vshad_path.cStr(), vs_id, vs_src);
+	CreateShader(GL_FRAGMENT_SHADER, fshad_path.cStr(), fs_id, fs_src);
+	CompileShader(vs_id, vs_src.cStr());
+	CompileShader(fs_id, fs_src.cStr());
+
+	uint prog_id = LinkProgram(vs_id, fs_id);
+	Shader* shader = new Shader(type, prog_id);
+
+	__GL_CALL(glDeleteShader(vs_id))
+	__GL_CALL(glDeleteShader(fs_id))
+
+	__LOG("Program = %d", prog_id)
+	__LOG_NL()
+
+	return shader;
+}
+
+//-----------------------------------------------------------------------------
+void			ShaderLoader::CreateShader(const uint shader_type, const char* filename, uint& shader_id, String& src)
+{
+	FileSystem fs;
+	if (!fs.Open(filename))
 	{
-		__LOG_E("Could not open %s!", vshad_path);
+		__LOG_E("Could not open %s!", filename);
 		exit(1);
 	}
-
-	uint vert_shader_id = glCreateShader(GL_VERTEX_SHADER);
+	shader_id = glCreateShader(shader_type);
 #ifdef __debug__
 	OpenGL::CheckGLError();
 #endif
-
-	String shd_src_code = fs.Read();
-//	__LOG("Vertex shader source code:\n%s", shd_src_code)
-
-	CompileShader(vert_shader_id, shd_src_code.cStr());
-
-	// Fragment shader
-	if (!fs.Open(fshad_path)) exit(1);
-	uint frag_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-	shd_src_code = fs.Read().cStr();
-
-//	__LOG("Fragment shader source code:\n%s", shd_src_code)
-	CompileShader(frag_shader_id, shd_src_code.cStr());
-	
-	uint prog_id = LinkProgram(vert_shader_id, frag_shader_id);
-	__LOG("Program = %d", prog_id)
-
-	__GL_CALL(glDeleteShader(vert_shader_id))
-	__GL_CALL(glDeleteShader(frag_shader_id))
-	__LOG_NL()
-
-	Shader* shader = new Shader(type, prog_id);
-	return shader;
+	src = fs.Read();
 }
 
 //-----------------------------------------------------------------------------
@@ -71,7 +69,7 @@ void			ShaderLoader::CompileShader(const uint shader_id, const char* shader_src_
 	__LOG(compilation_res ? "Compilation succeed" : "Compilation failed")
 
 	// Check Vertex Shader
-	LogGLInfo(shader_id);
+	LogGLShaderInfo(shader_id);
 }
 
 //-----------------------------------------------------------------------------
@@ -79,7 +77,7 @@ uint			ShaderLoader::LinkProgram(const uint vert_shader_id, const uint frag_shad
 {
 	__LOG("Linking program")
 	uint prog_id = glCreateProgram();
-#if _DEBUG
+#ifdef __debug__
 	OpenGL::CheckGLError();
 #endif
 	__GL_CALL(glAttachShader(prog_id, vert_shader_id))
@@ -91,16 +89,23 @@ uint			ShaderLoader::LinkProgram(const uint vert_shader_id, const uint frag_shad
 	__LOG(compilation_res ? "Compilation succeed" : "Compilation failed")
 
 	// Check the program
-//	logGLInfo(prog_id);
+	LogGLProgramInfo(prog_id);
 	return prog_id;
 }
 
 //-----------------------------------------------------------------------------
-void			ShaderLoader::LogGLInfo(uint id)
+void			ShaderLoader::LogGLShaderInfo(uint id)
 {
 	String msg(info_log_len);
-	glGetShaderInfoLog(id, info_log_len, NULL, msg.cStr());
+	__GL_CALL(glGetShaderInfoLog(id, info_log_len, NULL, msg.cStr()))
 	if (!msg.IsEmpty())
-		__LOG(msg.cStr())
+		__LOG_E(msg.cStr())
 }
-
+void			ShaderLoader::LogGLProgramInfo(uint id)
+{
+	String msg(info_log_len);
+	__GL_CALL(glGetProgramInfoLog(id, info_log_len, NULL, msg.cStr()))
+	if (!msg.IsEmpty())
+		__LOG_E(msg.cStr())
+}
+//-----------------------------------------------------------------------------

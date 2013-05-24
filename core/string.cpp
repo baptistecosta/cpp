@@ -11,22 +11,15 @@
 	#include "typedefs.h"
 	#include "string.h"
 
-using	namespace owl;
+	using namespace owl;
 
 //---------------------------------------------------------------------------
 int				StringTools::Len(const char* str)
 {
 	int n = 0;
 	if (str)
-	{
-		while (*str++ != 0)
+		while (*str++)
 			n++;
-	}
-
-	//	Test it
-	// 	while (str[n++])
-	// 		;
-
 	return n;
 }
 

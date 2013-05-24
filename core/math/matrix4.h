@@ -67,8 +67,10 @@ static	Matrix4		static_identity;
 							);
 		float			Determinant();
 		Matrix4			Inverse();
-const	Matrix4			Transpose() const;
+		const Matrix4	Transpose() const;
 		void			Multiply(Matrix4* b);
+
+		void			Log();
 
 static	Matrix4			Translation(const float x, const float y, const float z);
 static	Matrix4			Translation(const Vector3 &v);

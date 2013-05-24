@@ -12,7 +12,7 @@
 	#include "externs/opengl/inc/glew.h"
 	#include "externs/opengl/inc/glfw.h"
 	#include "externs/stb_image/stb_image.c"
-	#include "graphics_wrappers/opengl.h"
+	#include "graphics/opengl.h"
 	#include "image_loader.h"
 	#include "picture.h"
 	#include "resource_manager.h"

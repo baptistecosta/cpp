@@ -4,7 +4,7 @@
 */
 
 	#include <assert.h>
-	#include "opengl_renderer.h"
+	#include "graphics/opengl_renderer.h"
 	#include "rendering_geometry.h"
 	#include "object.h"
 	#include "mesh.h"

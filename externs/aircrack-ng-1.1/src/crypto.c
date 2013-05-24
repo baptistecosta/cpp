@@ -633,7 +633,7 @@ int calc_ptk( struct WPA_ST_info *wpa, uchar pmk[32] )
         HMAC(EVP_sha1(), pmk, 32, pke, 100, wpa->ptk + i * 20, NULL );
     }
 
-    /* check the EAPOL frame MIC */
+    /* check the EAPOL frame 
 
     if( ( wpa->keyver & 0x07 ) == 1 )
         HMAC(EVP_md5(), wpa->ptk, 16, wpa->eapol, wpa->eapol_size, mic, NULL );

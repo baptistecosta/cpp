@@ -4,8 +4,8 @@
 */
 
 	#include <assert.h>
-	#include "graphics_wrappers/opengl.h"
-	#include "graphics_wrappers/opengl_renderer.h"
+	#include "graphics/opengl.h"
+	#include "graphics/opengl_renderer.h"
 	#include "resources/shader.h"
 	#include "resources/text2d.h"
 	#include "rendering_context.h"

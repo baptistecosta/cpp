@@ -30,19 +30,19 @@ typedef	struct	StringTools
 		enum	IToS
 		{	MaxLen	=	64	};
 
-		static	int					Len(const char* cstr);
-		static	char*				Cpy(char* dest, const char* src);
-		static	char*				Cpy(char* dest, const char* src, const int length);
-		static	char*				Cat(char* dest, const char* src);
-		static	bool				Cmp(const char* a, const char* b);
-		static	bool				CaseCmp(const char* a, const char* b);
-		static	char*				IToS(int val, char* buf_start_addr);
-		static	String				IToS(int n);
+static	int					Len(const char* cstr);
+static	char*				Cpy(char* dest, const char* src);
+static	char*				Cpy(char* dest, const char* src, const int length);
+static	char*				Cat(char* dest, const char* src);
+static	bool				Cmp(const char* a, const char* b);
+static	bool				CaseCmp(const char* a, const char* b);
+static	char*				IToS(int val, char* buf_start_addr);
+static	String				IToS(int n);
 
 		//! Format specifier: http://www.cplusplus.com/reference/clibrary/cstdio/printf/
-		static	String				Format(const char* str_format, va_list varg);
+static	String				Format(const char* str_format, va_list varg);
 
-		static	unsigned long int	Hash(const char* str);
+static	unsigned long int	Hash(const char* str);
 } St;
 
 //!
@@ -62,7 +62,7 @@ public:
 		~String()										{	delete [] m_str;	}
 
 		//---------------------------------------------------------------------
-const	char				operator [] (const int i) const;
+		const char			operator [] (const int i) const;
 
 		String&				operator =	(const String& b);
 		String&				operator =	(const char* str);
@@ -81,8 +81,8 @@ const	char				operator [] (const int i) const;
 		char*				Begin() const;
 		bool				CaseCmp(const String& b) const;
 		bool				Compare(const int pos, const int len, const char* code);
-		char*				cStr()												{	return m_str;	};
-const	char*				cStr() const										{	return m_str;	};
+		char*				cStr()						{	return m_str;	};
+		const char*			cStr() const				{	return m_str;	};
 //		bool				contain(const char* _code);
 		// The class won't be responsible anymore of the object pointed by str.
 		// The string object won't be deleted when the destructor is called.
@@ -93,16 +93,16 @@ const	char*				cStr() const										{	return m_str;	};
 		const int			FindFirstOf(const char* code);
 		const int			FindLastOf(const char* code);
 		
-const	String				FileExtension() const;
-const	String				FilenameFromPath() const;
-const	String				Keep(const int pos, const int size);
-const	bool				IsEmpty() const;
-const	bool				IsNull() const;
+		const String		FileExtension() const;
+		const String		FilenameFromPath() const;
+		const String		Keep(const int pos, const int size);
+		const bool			IsEmpty() const;
+		const bool			IsNull() const;
 		String				Prepend(const String& str);
-const	int					Size() const;
+		const int			Size() const;
 		void				ToLower();
 		void				ToUpper();
-const	String&				Unquotify();
+		const String&		Unquotify();
 
 		// Format specifier: http://www.cplusplus.com/reference/clibrary/cstdio/printf/
 static	String				Format(const char* str_format, ...);

@@ -13,15 +13,16 @@
 	using namespace owl::math;
 
 //-----------------------------------------------------------------------------
+Vector2				Camera::resolution;
 const float			Camera::move_speed = 0.4f;
 const float			Camera::orientation_speed = 0.001f;
 
 //-----------------------------------------------------------------------------
 Camera::Camera()
 	:	proj_state(Camera::PerspProj)
-	,	m_pos(-6, 9, 15)
-	,	m_hQ(2.8f)
-	,	m_vQ(-0.5f)
+	,	m_pos(0, 0, 0)
+	,	m_hQ(0.f)
+	,	m_vQ(0.f)
 	,	m_fov(45.f)
 	,	mouse_x(0)
 	,	mouse_y(0)
@@ -53,10 +54,10 @@ void			Camera::UpdateAngleFromBlockedMousePosition(const Vector2& screen_res)
 }
 
 //-----------------------------------------------------------------------------
-void			Camera::ComputeViewProjMatrices(const Vector2& m)
+void			Camera::ComputeViewProjMatrices(const Vector2& offset)
 {
-	m_hQ += m.x * orientation_speed * FrameRate::framerate.GetSpeedFactor();
-	m_vQ += m.y * orientation_speed * FrameRate::framerate.GetSpeedFactor();
+	m_hQ += offset.x * orientation_speed * FrameRate::framerate.GetSpeedFactor();
+	m_vQ += offset.y * orientation_speed * FrameRate::framerate.GetSpeedFactor();
 
 	// Front vector
 	m_direction = Vector3(cos(m_vQ) * sin(m_hQ), sin(m_vQ), cos(m_vQ) * cos(m_hQ));
@@ -100,3 +101,9 @@ void			Camera::onKeyEvent_Left()
 void			Camera::onKeyEvent_Right()
 {	m_pos += m_right * FrameRate::framerate.GetSpeedFactor() * move_speed;	}
 
+
+//-----------------------------------------------------------------------------
+void			Camera::onMouseMoveEvent(int x, int y)
+{
+	ComputeViewProjMatrices(Vector2(-(x - (resolution.x * 0.5f)), y - (resolution.y * 0.5f)));
+}

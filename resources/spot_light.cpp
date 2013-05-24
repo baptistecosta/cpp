@@ -7,7 +7,7 @@
 	#include "core/keymap.h"
 	#include "core/string.h"
 		
-using namespace owl;
+	using namespace owl;
 
 //-----------------------------------------------------------------------------
 SpotLight::SpotLight(const SpotLight& l)

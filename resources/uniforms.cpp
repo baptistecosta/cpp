@@ -9,7 +9,7 @@
 	#include "core/string.h"
 	#include "core/log.h"
 	#include "externs/opengl/inc/glew.h"
-	#include "graphics_wrappers/opengl.h"
+	#include "graphics/opengl.h"
 	#include "rendering_context.h"
 	#include "material.h"
 	#include "uniforms.h"

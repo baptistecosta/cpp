@@ -18,7 +18,7 @@ class	Material	:	public	Resource
 		float			m_Ns;				// Shininess of a 3D mesh material (1 - 200).
 
 public:
-		
+	
 		Material(String guid = "default_material");
 
 		Material&		operator =	(const Material& mtl);
@@ -36,8 +36,7 @@ const	float&			getNs() const					{	return m_Ns;	}
 static	const Vector3	def_Ka, def_Kd, def_Ks;
 static	const float		def_Ns;
 
-
-const	void			log();
+		const void		log();
 };
 
 }		// owl

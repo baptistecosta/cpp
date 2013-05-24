@@ -3,16 +3,17 @@
 	@author		Baptiste Costa
 */
 
-	#include "typedefs.h"
 	#include "matrix4.h"
+	#include "core/log.h"
 	#include "matrix3.h"
 	#include "quaternion.h"
+	#include "typedefs.h"
 
-using namespace owl;
-using namespace owl::math;
+	using namespace owl;
+	using namespace owl::math;
 
 //-----------------------------------------------------------------------------
-Matrix4		Matrix4::static_identity(1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1);
+Matrix4			Matrix4::static_identity(1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1);
 
 //-----------------------------------------------------------------------------
 void			Matrix4::LoadIdentity()
@@ -207,3 +208,12 @@ Matrix4		Matrix4::Inverse()
 	return dst;
 }
 
+//---------------------------------------------------------------------------
+void			Matrix4::Log()
+{
+	__LOG("%.02f, %.02f, %.02f, %.02f", m[0], m[1], m[2], m[3])
+	__LOG("%.02f, %.02f, %.02f, %.02f", m[4], m[5], m[6], m[7])
+	__LOG("%.02f, %.02f, %.02f, %.02f", m[8], m[9], m[10], m[11])
+	__LOG("%.02f, %.02f, %.02f, %.02f", m[12], m[13], m[14], m[15])
+	__LOG_NL()
+}

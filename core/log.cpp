@@ -7,6 +7,7 @@
 	#include <stdarg.h>
 	#include "log.h"
 	#include "string.h"
+	#include "defines.h"
 
 	using namespace owl;
 
@@ -87,7 +88,7 @@ void			Log::Tee(FILE* f, const char* fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	vprintf(fmt, va);
+	Print(StringTools::Format(fmt, va).cStr());
 	va_end(va);
 
 	if (f)

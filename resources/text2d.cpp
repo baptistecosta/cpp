@@ -5,7 +5,7 @@
 
 	#include "glew.h"
 	#include "core/log.h"
-	#include "graphics_wrappers/opengl.h"
+	#include "graphics/opengl.h"
 	#include "object.h"
 	#include "picture.h"
 	#include "font.h"

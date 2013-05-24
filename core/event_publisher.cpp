@@ -4,6 +4,7 @@
 */
 
 	#include <assert.h>
+	#include "core/math/vector.h"
 	#include "externs/opengl/inc/glfw.h"
 	#include "typedefs.h"
 	#include "event_publisher.h"
@@ -24,11 +25,11 @@ EventPublisher::EventPublisher()
 void			EventPublisher::OnUpdate()
 {
 	// Mouse position
-	int	x = 0, y = 0;
-	glfwGetMousePos(&x, &y);
-	if (x != m_lmx || y != m_lmy)
-		NotifyMouseMoveEvent(m_lmx = x, m_lmy = y);
-	
+	int mx = 0, my = 0;
+	glfwGetMousePos(&mx, &my);
+	if (mx || my)
+		NotifyMouseMoveEvent(mx, my);
+
 	// Mouse wheel
 	int mw = glfwGetMouseWheel();
 	if (mw > m_lmw)
@@ -103,8 +104,7 @@ void			EventPublisher::NotifyMouseMoveEvent(const int x, const int y)
 	{
 		assert(registered_objects[i]);
 		registered_objects[i]->onMouseMoveEvent(x, y);
-	}
-		
+	}	
 }
 
 //-----------------------------------------------------------------------------

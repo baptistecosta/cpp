@@ -6,8 +6,8 @@
 	#include "rendering_geometry.h"
 	#include "core/math/math.h"
 	#include "core/log.h"
-	#include "graphics_wrappers/opengl.h"
-	#include "graphics_wrappers/opengl_renderer.h"
+	#include "graphics/opengl.h"
+	#include "graphics/opengl_renderer.h"
 	#include "resources/resource_manager.h"
 
 	using namespace owl;

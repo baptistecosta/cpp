@@ -3,9 +3,9 @@
 
 	#include "typedefs.h"
 
-namespace owl
-{
+namespace owl {
 
+//!
 struct HMAC_SHA1
 {
 static	void			Process(uchar *key, int key_len, uchar* data, int data_len, uchar* digest);

@@ -4,9 +4,9 @@
 */
 
 	#include "point_light.h"
-	#include "core\string.h"
+	#include "core/string.h"
 	
-using namespace owl;
+	using namespace owl;
 
 //-----------------------------------------------------------------------------
 PointLight::PointLight(const PointLight& l)
