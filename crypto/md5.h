@@ -2,6 +2,7 @@
 #define __OWL_CRYPTO_MD5__
 
 	#include "defines.h"
+	#include "hash.h"
 
 namespace owl {
 
@@ -14,7 +15,7 @@ namespace owl {
 // efficiently on either one than if ARCH_IS_BIG_ENDIAN is defined.
 
 //!
-class	MD5
+class	MD5	:	public Hash
 {
 		uchar			buf[64];	// Accumulate block
 		uint			count[2],	// Message length in bits, lsw first
@@ -24,7 +25,10 @@ class	MD5
 
 public:
 
+static	const int		iterations;
+
 		MD5();
+
 		// Append a string to the message
 		void			Append(const uchar* data, int nbytes);
 		// Finish the message and return the digest

@@ -128,14 +128,14 @@ struct	MACHeader
 		uchar*			frame;
 
 		FrameControl	frame_ctrl;
-		ushort*			duration_id;
-		uchar			addr_1[6],
+		ui16			duration_id;
+		ui8				addr_1[6],
 						addr_2[6],
 						addr_3[6];
 		SequenceControl	seq_ctrl;
 		uchar			addr_4[6];
 
-		uint*			fcs;
+		ui32			fcs;
 
 		MACHeader(uchar* frame);
 

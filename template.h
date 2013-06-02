@@ -1,5 +1,5 @@
 /*
-	bEngine :: 2011 - 2013s
+	engine :: 2011 - 2013
 	Baptiste Costa
 */
 
@@ -13,11 +13,9 @@ namespace owl {
 //!
 class	ClassName
 {
-private:
-
 public:
 
-		ClassName			();
+		ClassName();
 };
 
 }		//	owl

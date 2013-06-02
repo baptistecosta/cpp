@@ -12,7 +12,7 @@
 #define __CL_DEBUG
 
 #ifdef __CL_DEBUG
-#define	__CL_CALL(_C_)	{ int err = _C_; OpenCLWrapper::CheckCLErr(err); }
+#define	__CL_CALL(_C_)	{	int err = _C_; OpenCLWrapper::CheckCLErr(err);	}
 #else
 #define __CL_CALL(_C_)	_C_;
 #endif

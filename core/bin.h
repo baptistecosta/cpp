@@ -1,17 +1,43 @@
 #ifndef __CORE_BIN__
 #define __CORE_BIN__
 
-	#include "typedefs.h"
+	#include <limits.h>
+	#include "../defines.h"
 
 namespace owl
 {
 
+#if CHAR_BIT != 8
+#error "OWL ERROR: Unsupported char size!"
+#endif
+
+//!
+enum
+{
+	Order32_LittleEndian	=	0x03020100ul,
+	Order32_BigEndian		=	0x00010203ul,
+	Order32_PDPEndian		=	0x01000302ul,
+};
+//!
+static const union
+{
+	ui8				bytes[4];
+	ui32			value;
+
+} host32_order = { { 0, 1, 2, 3 } };
+
+bool			IsLittleEndian();
+bool			IsBigEndian();
+bool			IsPDPEndian();
+
+//!
 enum
 {
 	LSB		=	0x01,	// Least significant bit
 	MSB		=	0x80	// Most significant bit
 };
 
+//!
 enum	Flags
 {
 	Flag_0	=	1 << 0,		//	0000 0000 0000 0001	==	0x1
@@ -55,9 +81,7 @@ enum	Flags
 extern int		var;
 
 extern void		OutputBinary(unsigned char d, const bool l_end = true);
-
 ulint			Rot32l(const uint val, const uint steps);
-
 void			SwapEndian(uchar* in, uchar* out, const int len);
 
 }		//	owl

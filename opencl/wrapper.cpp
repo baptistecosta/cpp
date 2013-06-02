@@ -89,16 +89,23 @@ void			OpenCLWrapper::CreateProgram()
 
 //---------------------------------------------------------------------------
 void			OpenCLWrapper::BuildProgram()
-{	__CL_CALL(clBuildProgram(prog, 1, device_ids, NULL, NULL, NULL))	}
+{
+	err = clBuildProgram(prog, 1, device_ids, NULL, NULL, NULL);
+	if (err != CL_SUCCESS)
+	{
+		LogProgramBuildInfo();
+		CheckCLErr(err);
+	}
+}
 
 //---------------------------------------------------------------------------
 void			OpenCLWrapper::LogProgramBuildInfo()
 {
 	size_t len = 0;
-	char buf[512] = {0};
 	__CL_CALL(clGetProgramBuildInfo(prog, device_ids[0], CL_PROGRAM_BUILD_LOG, 0, NULL, &len))
-		__CL_CALL(clGetProgramBuildInfo(prog, device_ids[0], CL_PROGRAM_BUILD_LOG, len, buf, NULL))
-		Log::e(buf);
+	String buf(len);
+	__CL_CALL(clGetProgramBuildInfo(prog, device_ids[0], CL_PROGRAM_BUILD_LOG, len, buf.cStr(), NULL))
+	__LOG_E(buf.cStr())
 }
 
 //---------------------------------------------------------------------------
@@ -171,7 +178,7 @@ void			OpenCLWrapper::LogPlatformInfo()
 		__CL_CALL(clGetPlatformInfo(platform_ids[i], CL_PLATFORM_VENDOR, sizeof(vendor), &vendor, NULL));
 		__CL_CALL(clGetPlatformInfo(platform_ids[i], CL_PLATFORM_PROFILE, sizeof(profile), &profile, NULL));
 		Log::HorizontalLine();
-		Log::i("#%d", i);
+		Log::i("#%d", i + 1);
 		Log::i("Platform ID:        %d", platform_ids[i]);
 		Log::i("Version:            %s", version);
 		Log::i("Name:               %s", name);
@@ -201,7 +208,7 @@ void			OpenCLWrapper::LogPlatformInfo()
 			__CL_CALL(clGetDeviceInfo(dev_ids[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(max_mem_alloc_size), &max_mem_alloc_size, NULL));
 			__CL_CALL(clGetDeviceInfo(dev_ids[j], CL_DEVICE_ENDIAN_LITTLE, sizeof(endian_little), &endian_little, NULL));
 
-			Log::i("    #%d", j);
+			Log::i("    #%d", j + 1);
 			Log::i("    Device ID:              %d", dev_ids[j]);
 			Log::i("    Name:                   %s", dev_name);
 			if		(type == CL_DEVICE_TYPE_CPU)
@@ -227,28 +234,28 @@ void			OpenCLWrapper::CheckCLErr(const cl_int err)
 		switch (err)
 		{
 			case CL_INVALID_VALUE:
-				Log::e("CL_INVALID_VALUE");
+				__LOG_E("CL_INVALID_VALUE")
 				break;
 			case CL_BUILD_PROGRAM_FAILURE:
-				Log::e("CL_BUILD_PROGRAM_FAILURE");
+				__LOG_E("CL_BUILD_PROGRAM_FAILURE")
 				break;
 			case CL_INVALID_PLATFORM:
-				Log::e("CL_INVALID_PLATFORM");
+				__LOG_E("CL_INVALID_PLATFORM")
 				break;
 			case CL_INVALID_HOST_PTR:
-				Log::e("CL_INVALID_HOST_PTR");
+				__LOG_E("CL_INVALID_HOST_PTR")
 				break;
 			case CL_INVALID_PROGRAM_EXECUTABLE:
-				Log::e("CL_INVALID_PROGRAM_EXECUTABLE");
+				__LOG_E("CL_INVALID_PROGRAM_EXECUTABLE")
 				break;
 			case CL_INVALID_KERNEL_NAME:
-				Log::e("CL_INVALID_KERNEL_NAME");
+				__LOG_E("CL_INVALID_KERNEL_NAME")
 				break;
 			case CL_INVALID_KERNEL_ARGS:
-				Log::e("CL_INVALID_KERNEL_ARGS");
+				__LOG_E("CL_INVALID_KERNEL_ARGS")
 				break;
 			default:
-				Log::e(String::Format("number = %d", err));
+				__LOG_E(String::Format("number = %d", err).cStr())
 				break;
 		}
 		exit(-1);

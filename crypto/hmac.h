@@ -17,7 +17,7 @@ struct HMAC
 	static void			Process(uchar* key, int key_len, uchar* data, int data_len, uchar* digest)
 	{
 		uchar k0[BLOCK_SIZE]  = {0};
-	
+
 		// Step 1
 		if (key_len != BLOCK_SIZE)
 		{
@@ -25,7 +25,7 @@ struct HMAC
 			if (key_len > BLOCK_SIZE)
 			{
 				HashMethod::Process(key, key_len, digest);
-				for (int i = 0; i < 20; i++)
+				for (int i = 0; i < HashMethod::iterations; i++)
 					k0[i] = digest[i];
 			}
 			// Step 3
@@ -61,15 +61,16 @@ struct HMAC
 			step_7_data[i] = k0[i] ^ opad;
 	
 		// Step 8
-		uchar step_8_data[BLOCK_SIZE + 20] = {0};
+		uchar* step_8_data = new uchar[BLOCK_SIZE + HashMethod::iterations];
 		for (int i = 0; i < BLOCK_SIZE; i++)
 			step_8_data[i] = step_7_data[i];
 	
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < HashMethod::iterations; i++)
 			step_8_data[i + BLOCK_SIZE] = digest[i];
 	
 		// Step 9
-		HashMethod::Process(step_8_data, BLOCK_SIZE + 20, digest);
+		HashMethod::Process(step_8_data, BLOCK_SIZE + HashMethod::iterations, digest);
+		delete [] step_8_data;
 	}
 };
 
