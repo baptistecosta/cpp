@@ -67,14 +67,14 @@ void			Radiotap::Log(uchar* frame)
 				case FLAGS:
 				{
 					uchar f = frame[offset];
-					if (f & FLAGS_CFP)		__LOG("FLAGS: sent/received during CFP")
-					if (f & FLAGS_SHORTPRE)	__LOG("FLAGS: sent/received with short preamble")
-					if (f & FLAGS_WEP)		__LOG("FLAGS: sent/received with WEP encryption")
-					if (f & FLAGS_FRAG)		__LOG("FLAGS: sent/received with fragmentation")
-					if (f & FLAGS_FCS)		__LOG("FLAGS: frame includes FCS")
-					if (f & FLAGS_DATAPAD)	__LOG("FLAGS: frame has padding between 802.11 header and payload (to 32-bit boundary)")
-					if (f & FLAGS_BADFCS)	__LOG("FLAGS: frame failed FCS check")
-					if (f & FLAGS_SGI)		__LOG("FLAGS: frame used short guard interval (HT)")
+					if (f & FLAGS_CFP)		__LOG("FLAGS: sent/received during CFP");
+					if (f & FLAGS_SHORTPRE)	__LOG("FLAGS: sent/received with short preamble");
+					if (f & FLAGS_WEP)		__LOG("FLAGS: sent/received with WEP encryption");
+					if (f & FLAGS_FRAG)		__LOG("FLAGS: sent/received with fragmentation");
+					if (f & FLAGS_FCS)		__LOG("FLAGS: frame includes FCS");
+					if (f & FLAGS_DATAPAD)	__LOG("FLAGS: frame has padding between 802.11 header and payload (to 32-bit boundary)");
+					if (f & FLAGS_BADFCS)	__LOG("FLAGS: frame failed FCS check");
+					if (f & FLAGS_SGI)		__LOG("FLAGS: frame used short guard interval (HT)");
 					break;
 				}
 				case RATE:

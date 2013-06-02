@@ -18,6 +18,8 @@ namespace owl {
 
 class	String;
 
+extern const bool __log__;
+
 //!
 struct	LogPolicyLevelInfo		{	static	String		Format(const char*);	};
 struct	LogPolicyLevelError		{	static	String		Format(const char*);	};
@@ -25,10 +27,14 @@ struct	LogPolicyLevelWarning	{	static	String		Format(const char*);	};
 
 //!
 template <class LogPolicyLevel>
-struct	Dump
+struct  TLog
 {
-	static void			Process(const char* str_format, ...)
+	static void o(const char* str_format, ...)
 	{
+#ifndef __debug__
+		return;
+#endif
+
 		va_list varg;
 		va_start(varg, str_format);
 		String str = StringTools::Format(str_format, varg);
@@ -43,29 +49,13 @@ struct	Dump
 	}
 };
 
-#ifdef __debug__
-	#define	__LOG(_FORMAT_, ...)	{	Dump<LogPolicyLevelInfo>::Process(_FORMAT_, __VA_ARGS__);	}
-	#define	__LOG_E(_FORMAT_, ...)	{	Dump<LogPolicyLevelError>::Process(_FORMAT_, __VA_ARGS__);	}
-	#define	__LOG_W(_FORMAT_, ...)	{	Dump<LogPolicyLevelWarning>::Process(_FORMAT_, __VA_ARGS__);	}
-	#define __LOG_NL()				{	Dump<LogPolicyLevelInfo>::Process("");	}
-#else
-	#define	__LOG(_FORMAT_, ...)	{	;	}
-	#define	__LOG_E(_FORMAT_, ...)	{	;	}
-	#define	__LOG_W(_FORMAT_, ...)	{	;	}
-	#define __LOG_NL()				{	;	}
-#endif
+typedef TLog<LogPolicyLevelInfo>	LogI;
+typedef TLog<LogPolicyLevelError>	LogE;
+typedef TLog<LogPolicyLevelWarning>	LogW;
 
 //!
 struct  Log
 {
-static	const bool		log;
-
-static	void			i(const String& msg);
-static	void			i(const char* format, ...);
-
-static	void			e(const String& msg);
-static	void			e(const char* format, ...);
-
 static	void			Flat(const String& msg);
 static	void			Flat(const char* format, ...);
 

@@ -95,26 +95,26 @@ void			MACHeader::Parse()
 		switch (f->id)
 		{
 			case FieldID_FrameCtrl:
-				__LOG("Frame control data:")
-				__LOG("Version = %d", frame_ctrl.version);
+				LogI::o("Frame control data:");
+				LogI::o("Version = %d", frame_ctrl.version);
 
 				switch (frame_ctrl.type)
 				{
 					case Management:
-						__LOG("Type: Management")
+						LogI::o("Type: Management");
 						switch (frame_ctrl.subtype)
 						{
-							case FC::AssocRes: __LOG("Subtype: Association response") break;
-							case FC::ReassocReq: __LOG("Subtype: Reassociation request") break;
-							case FC::ReassocRes: __LOG("Subtype: Reassociation response") break;
-							case FC::ProbeReq: __LOG("Subtype: Probe request") break;
-							case FC::ProbeRes: __LOG("Subtype: Probe response") break;
-							case FC::Beacon: __LOG("Subtype: Beacon") break;
-							case FC::ATIM: __LOG("Subtype: ATIM") break;
-							case FC::Disassoc: __LOG("Subtype: Disassociation") break;
-							case FC::Auth: __LOG("Subtype: Authentication") break;
-							case FC::Deauth: __LOG("Subtype: Deauthentication") break;
-							case FC::Action: __LOG("Subtype: Action") break;
+							case FC::AssocRes: LogI::o("Subtype: Association response"); break;
+							case FC::ReassocReq: LogI::o("Subtype: Reassociation request"); break;
+							case FC::ReassocRes: LogI::o("Subtype: Reassociation response"); break;
+							case FC::ProbeReq: LogI::o("Subtype: Probe request"); break;
+							case FC::ProbeRes: LogI::o("Subtype: Probe response"); break;
+							case FC::Beacon: LogI::o("Subtype: Beacon"); break;
+							case FC::ATIM: LogI::o("Subtype: ATIM"); break;
+							case FC::Disassoc: LogI::o("Subtype: Disassociation"); break;
+							case FC::Auth: LogI::o("Subtype: Authentication"); break;
+							case FC::Deauth: LogI::o("Subtype: Deauthentication"); break;
+							case FC::Action: LogI::o("Subtype: Action"); break;
 						}
 						break;
 
@@ -122,14 +122,14 @@ void			MACHeader::Parse()
 						__LOG("Type: Control");
 						switch (frame_ctrl.subtype)
 						{
-							case FC::BlockAckReq: __LOG("Subtype: Block acknowledgement request") break;
-							case FC::BlockAck: __LOG("Subtype: Block acknowledgement") break;
-							case FC::PS_Poll: __LOG("Subtype: PS-Poll") break;
-							case FC::RTS: __LOG("Subtype: Request-to-send frame (RTS)") break;
-							case FC::CTS: __LOG("Subtype: Clear-to-send frame (CTS)") break;
-							case FC::ACK: __LOG("Subtype: Acknowledge frame (ACK)") break;
-							case FC::CFEnd: __LOG("CF-end") break;
-							case FC::CFEnd_CFAck: __LOG("CF-end + CF-ack") break;
+							case FC::BlockAckReq: LogI::o("Subtype: Block acknowledgement request") break;
+							case FC::BlockAck: LogI::o("Subtype: Block acknowledgement") break;
+							case FC::PS_Poll: LogI::o("Subtype: PS-Poll") break;
+							case FC::RTS: LogI::o("Subtype: Request-to-send frame (RTS)") break;
+							case FC::CTS: LogI::o("Subtype: Clear-to-send frame (CTS)") break;
+							case FC::ACK: LogI::o("Subtype: Acknowledge frame (ACK)") break;
+							case FC::CFEnd: LogI::o("CF-end") break;
+							case FC::CFEnd_CFAck: LogI::o("CF-end + CF-ack") break;
 						}
 						break;
 

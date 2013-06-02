@@ -20,57 +20,12 @@ String			LogPolicyLevelWarning::Format(const char* msg)
 {	return String::Format("Warning: %s\n", msg);	}
 //-----------------------------------------------------------------------------
 
-
-#ifdef _DEBUG		// Windows
-	const bool	Log::log = true;
-#else
-	#ifndef NDEBUG	// Linux
-		const bool	Log::log = true;
-	#else
-		const bool	Log::log = false;
-	#endif
-#endif
-
-//-----------------------------------------------------------------------------
-void			Log::i(const String& msg)
-{	if (Log::log) Log::i(msg.cStr());	}
-void			Log::i(const char* str_format, ...)
-{
-	if (Log::log)
-	{
-		va_list varg;
-		va_start(varg, str_format);
- 		String str = StringTools::Format(str_format, varg);
-		String out = String::Format("%s\n", str.cStr());
-		Print(out.cStr());
-		va_end(varg);
-	}
-}
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-void			Log::e(const String& msg)
-{	if (Log::log) Log::e(msg.cStr());	}
-void			Log::e(const char* format, ...)
-{
-	if (Log::log) 
-	{
-		va_list varg;
-		va_start(varg, format);
-		String str = StringTools::Format(format, varg);
-		String out = String::Format("Error: %s\n", str.cStr());
-		Print(out.cStr());
-		va_end(varg);
-	}
-}
-//-----------------------------------------------------------------------------
-
 //-----------------------------------------------------------------------------
 void			Log::Flat(const String& msg)
-{	if (Log::log) Log::i(msg.cStr());	}
+{	Log::Flat(msg.cStr());	}
 void			Log::Flat(const char* format, ...)
 {
-	if (Log::log)
+	if (__debug__)
 	{
 		va_list varg;
 		va_start(varg, format);
@@ -142,10 +97,10 @@ void			Log::Binary(const void* const ptr, const size_t len)
 
 //-----------------------------------------------------------------------------
 void			Log::HorizontalLine()
-{	if (Log::log) Print("\n===============================================================\n");	}
+{	if (__debug__) Print("\n===============================================================\n");	}
 //-----------------------------------------------------------------------------
 void			Log::NewLine()
-{	if (Log::log) Print("\n");	}
+{	if (__debug__) Print("\n");	}
 
 //-----------------------------------------------------------------------------
 void			Log::Print(const char* out)

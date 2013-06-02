@@ -3,6 +3,7 @@
 
 	#include "core/containers/vector.h"
 	#include "core/bin.h"
+	#include "defines.h"
 
 namespace owl
 {
