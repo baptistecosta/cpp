@@ -58,4 +58,4 @@ const void		Vector3::Cross(Vector3& r, const Vector3& a, const Vector3& b)
 
 //-----------------------------------------------------------------------------
 void			Vector3::Log(const char* v)
-{	__LOG("%s [%f; %f; %f]", v, x, y, z)	}
+{	Log::i("%s [%f; %f; %f]", v, x, y, z);	}

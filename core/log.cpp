@@ -6,44 +6,94 @@
 	#include <ctype.h>
 	#include <stdarg.h>
 	#include "log.h"
-	#include "string.h"
-	#include "defines.h"
 
 	using namespace owl;
 
-//-----------------------------------------------------------------------------
-String			LogPolicyLevelInfo::Format(const char* msg)
-{	return String::Format("Info: %s\n", msg);	}
-String			LogPolicyLevelError::Format(const char* msg)
-{	return String::Format("Error: %s\n", msg);	}
-String			LogPolicyLevelWarning::Format(const char* msg)
-{	return String::Format("Warning: %s\n", msg);	}
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+#ifdef __debug__
+const bool		Log::__log__ = true;
+#else
+const bool		Log::__log__ = false;
+#endif
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+void			Log::i(const String& msg)
+{	Log::i(msg.cStr());	}
+void			Log::i(const char* format, ...)
+{
+	if (__log__)
+	{
+		va_list varg;
+		va_start(varg, format);
+		String str = StringTools::Format(format, varg);
+		String out = String::Format("%s\n", str);
+		va_end(varg);
+
+		IO::Print(out.cStr());
+	}
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+void			Log::e(const String& msg)
+{	Log::e(msg.cStr());	}
+void			Log::e(const char* format, ...)
+{
+	if (__log__)
+	{
+		va_list varg;
+		va_start(varg, format);
+		String str = StringTools::Format(format, varg);
+		String out = String::Format("Error: %s\n", str);
+		va_end(varg);
+
+		IO::Print(out.cStr());
+	}
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+void			Log::w(const String& msg)
+{	Log::w(msg.cStr());	}
+void			Log::w(const char* format, ...)
+{
+	if (__log__)
+	{
+		va_list varg;
+		va_start(varg, format);
+		String str = StringTools::Format(format, varg);
+		String out = String::Format("Warning: %s\n", str);
+		va_end(varg);
+
+		IO::Print(out.cStr());
+	}
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 void			Log::Flat(const String& msg)
 {	Log::Flat(msg.cStr());	}
 void			Log::Flat(const char* format, ...)
 {
-	if (__debug__)
+	if (__log__)
 	{
 		va_list varg;
 		va_start(varg, format);
 		String str = StringTools::Format(format, varg);
 		String out = String::Format("%s", str.cStr());
-		Print(out.cStr());
+		IO::Print(out.cStr());
 		va_end(varg);
 	}
 }
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 void			Log::Tee(FILE* f, const char* fmt, ...)
 {
 	va_list va;
 
 	va_start(va, fmt);
-	Print(StringTools::Format(fmt, va).cStr());
+	IO::Print(StringTools::Format(fmt, va).cStr());
 	va_end(va);
 
 	if (f)
@@ -54,10 +104,10 @@ void			Log::Tee(FILE* f, const char* fmt, ...)
 	}
 }
 
-//-----------------------------------------------------------------------------
-void			Log::Hex(const unsigned char* data, int len, FILE* f)
+//---------------------------------------------------------------------------
+void			Log::Hex(const uchar* data, int len, FILE* f)
 {
-	unsigned char* buf = (unsigned char*)data;
+	uchar* buf = (uchar*)data;
 	for (int i = 0; i < len; i += 16)
 	{
 		Tee(f, "%06x: ", i);
@@ -76,17 +126,17 @@ void			Log::Hex(const unsigned char* data, int len, FILE* f)
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Little endian
+//---------------------------------------------------------------------------
+//! Little endian
 void			Log::Binary(const void* const ptr, const size_t len)
 {
-	unsigned char* b = (unsigned char*)ptr;
+	uchar* b = (uchar*)ptr;
 	for (unsigned int i = 0; i < len; i++)
 	{
 		Log::Flat("Byte %03d: ", i);
 		for (int j = 7; j >= 0; --j)
 		{
-			unsigned char byte = b[i] & (1<<j);
+			uchar byte = b[i] & (1<<j);
 			byte >>= j;
 			Log::Flat("%u", byte);
 		}
@@ -95,19 +145,9 @@ void			Log::Binary(const void* const ptr, const size_t len)
 	Log::NewLine();
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 void			Log::HorizontalLine()
-{	if (__debug__) Print("\n===============================================================\n");	}
-//-----------------------------------------------------------------------------
+{	if (__log__) IO::Print("\n===============================================================\n");	}
 void			Log::NewLine()
-{	if (__debug__) Print("\n");	}
-
-//-----------------------------------------------------------------------------
-void			Log::Print(const char* out)
-{
-#ifdef _WIN32
-		OutputDebugStringA(out);
-#elif __linux
-		printf("%s", out);
-#endif
-}
+{	if (__log__) IO::Print("\n");	}
+//---------------------------------------------------------------------------

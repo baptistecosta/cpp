@@ -23,10 +23,10 @@ const bool			FileSystem::Open(const String& path)
 	f = fopen(path.cStr(), "r");
 	if (!f)
 	{
-		Log::e(String::Format("Fail to open: %s", path.cStr()));
+		Log::e("Fail to open: %s", path.cStr());
 		return false;
 	}
-	Log::i(String::Format("Open file succeed: %s", path.cStr()));
+	Log::i("Open file succeed: %s", path.cStr());
 	return true;
 }
 

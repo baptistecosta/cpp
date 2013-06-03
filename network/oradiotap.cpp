@@ -61,33 +61,33 @@ void			Radiotap::Log(uchar* frame)
 				case TSFT:
 				{
 					ullong* ts = (ullong*)&frame[offset];
-					__LOG("TSTF: %ld", *ts)
+					Log::i("TSTF: %ld", *ts);
 					break;
 				}
 				case FLAGS:
 				{
 					uchar f = frame[offset];
-					if (f & FLAGS_CFP)		__LOG("FLAGS: sent/received during CFP");
-					if (f & FLAGS_SHORTPRE)	__LOG("FLAGS: sent/received with short preamble");
-					if (f & FLAGS_WEP)		__LOG("FLAGS: sent/received with WEP encryption");
-					if (f & FLAGS_FRAG)		__LOG("FLAGS: sent/received with fragmentation");
-					if (f & FLAGS_FCS)		__LOG("FLAGS: frame includes FCS");
-					if (f & FLAGS_DATAPAD)	__LOG("FLAGS: frame has padding between 802.11 header and payload (to 32-bit boundary)");
-					if (f & FLAGS_BADFCS)	__LOG("FLAGS: frame failed FCS check");
-					if (f & FLAGS_SGI)		__LOG("FLAGS: frame used short guard interval (HT)");
+					if (f & FLAGS_CFP)		Log::i("FLAGS: sent/received during CFP");
+					if (f & FLAGS_SHORTPRE)	Log::i("FLAGS: sent/received with short preamble");
+					if (f & FLAGS_WEP)		Log::i("FLAGS: sent/received with WEP encryption");
+					if (f & FLAGS_FRAG)		Log::i("FLAGS: sent/received with fragmentation");
+					if (f & FLAGS_FCS)		Log::i("FLAGS: frame includes FCS");
+					if (f & FLAGS_DATAPAD)	Log::i("FLAGS: frame has padding between 802.11 header and payload (to 32-bit boundary)");
+					if (f & FLAGS_BADFCS)	Log::i("FLAGS: frame failed FCS check");
+					if (f & FLAGS_SGI)		Log::i("FLAGS: frame used short guard interval (HT)");
 					break;
 				}
 				case RATE:
 				{
 					uchar b = frame[offset];
 					int r = (int)b * 500;
-					__LOG("TX/RX data rate = %d Kbps", r)
+					Log::i("TX/RX data rate = %d Kbps", r);
 					break;
 				}
 				case CHANNEL:
 				{
 					ushort* freq = (ushort*)&frame[offset];
-					__LOG("Channel frequency = %d MHz", *freq)
+					Log::i("Channel frequency = %d MHz", *freq);
 
 					ushort* flags = (ushort*)&frame[offset + sizeof(ushort)];
 					Log::Flat("Info: Channel flags: | ");
@@ -103,76 +103,76 @@ void			Radiotap::Log(uchar* frame)
 					break;
 				}
 				case FHSS:
-					__LOG("FHSS hop set: %x", frame[offset])
-					__LOG("FHSS hop pattern: %x", frame[offset + sizeof(uchar)])
+					Log::i("FHSS hop set: %x", frame[offset]);
+					Log::i("FHSS hop pattern: %x", frame[offset + sizeof(uchar)]);
 					break;
 				case DBM_ANTSIGNAL:
-					__LOG("Antenna signal = %d dBm", frame[offset])
+					Log::i("Antenna signal = %d dBm", frame[offset]);
 					break;
 				case DBM_ANTNOISE:
-					__LOG("Antenna noise = %d dBm", frame[offset])
+					Log::i("Antenna noise = %d dBm", frame[offset]);
 					break;
 				case LOCK_QUALITY:
 				{
 					ushort* b = (ushort*)&frame[offset];
-					__LOG("Lock quality = %d", *b)
+					Log::i("Lock quality = %d", *b);
 					break;
 				}
 				case TX_ATTENUATION:
 				{
 					ushort* b = (ushort*)&frame[offset];
-					__LOG("TX attenuation = %d", *b)
+					Log::i("TX attenuation = %d", *b);
 					break;
 				}
 				case DB_TX_ATTENUATION:
 				{
 					ushort* b = (ushort*)&frame[offset];
-					__LOG("dB TX attenuation = %d", *b)
+					Log::i("dB TX attenuation = %d", *b);
 					break;
 				}
 				case DBM_TX_POWER:
-					__LOG("dBm TX power = %d", frame[offset])
+					Log::i("dBm TX power = %d", frame[offset]);
 					break;
 				case ANTENNA:
-					__LOG("Antenna index = %d", frame[offset])
+					Log::i("Antenna index = %d", frame[offset]);
 					break;
 				case DB_ANTSIGNAL:
-					__LOG("dB antenna signal = %d", frame[offset])
+					Log::i("dB antenna signal = %d", frame[offset]);
 					break;
 				case DB_ANTNOISE:
-					__LOG("dB antenna noise = %d", frame[offset])
+					Log::i("dB antenna noise = %d", frame[offset]);
 					break;
 				case RX_FLAGS:
 				{
 					ushort* flags = (ushort*)&frame[offset];
 					if (*flags & FLAG_RX_BADPLCP)
-						__LOG("PLCP CRC check failed")
+						Log::i("PLCP CRC check failed");
 					break;
 				}
 				case MCS:
 				{
 					char known = (char)frame[offset];
-					if (known & MCS_HAVE_BW)	__LOG("MCS known: bandwidth")
-					if (known & MCS_HAVE_MCS)	__LOG("MCS known: MCS index")
-					if (known & MCS_HAVE_GI)	__LOG("MCS known: guard interval")
-					if (known & MCS_HAVE_FMT)	__LOG("MCS known: HT format")
-					if (known & MCS_HAVE_FEC)	__LOG("MCS known: FEC type")
+					if (known & MCS_HAVE_BW)	Log::i("MCS known: bandwidth");
+					if (known & MCS_HAVE_MCS)	Log::i("MCS known: MCS index");
+					if (known & MCS_HAVE_GI)	Log::i("MCS known: guard interval");
+					if (known & MCS_HAVE_FMT)	Log::i("MCS known: HT format");
+					if (known & MCS_HAVE_FEC)	Log::i("MCS known: FEC type");
 
 					{
 					uchar flag = frame[offset + sizeof(uchar)];
-					if		(flag == MCS_BW_20)		__LOG("MCS bandwidth = 20")
-					else if (flag == MCS_BW_40)		__LOG("MCS bandwidth = 40")
-					else if (flag == MCS_BW_20L)	__LOG("MCS bandwidth = 20L")
-					else if (flag == MCS_BW_20U)	__LOG("MCS bandwidth = 20U")
+					if		(flag == MCS_BW_20)		Log::i("MCS bandwidth = 20");
+					else if (flag == MCS_BW_40)		Log::i("MCS bandwidth = 40");
+					else if (flag == MCS_BW_20L)	Log::i("MCS bandwidth = 20L");
+					else if (flag == MCS_BW_20U)	Log::i("MCS bandwidth = 20U");
 					}
 
 					uchar mcs = frame[offset + sizeof(uchar) * 2];
-					__LOG("MCS rate index = %d", mcs)
+					Log::i("MCS rate index = %d", mcs);
 					break;
 				}
 			}
 			offset += e->size;
 		}
 	}
-	__LOG("Radiotap segment length = %d", hdr.Len() + data_len)
+	Log::i("Radiotap segment length = %d", hdr.Len() + data_len);
 }

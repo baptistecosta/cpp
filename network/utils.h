@@ -33,7 +33,7 @@ struct	NetworkUtils
 			else if (IsBigEndian())
 				memcpy(&r, a, s);
 			else
-				__LOG_E("Endianess unknown!");
+				Log::e("Endianess unknown!");
 		}
 		return r;
 	}

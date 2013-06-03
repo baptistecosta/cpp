@@ -7,12 +7,10 @@
 #define	__OWL_DEBUG__
 
 #ifdef _DEBUG		// Windows
-	#define __debug__	1
+	#define __debug__
 #else
 	#ifndef NDEBUG	// Linux
-		#define __debug__	1
-	#else
-		#define __debug__	0
+		#define __debug__
 	#endif
 #endif
 
