@@ -8,8 +8,9 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include <assert.h>
-	#include "typedefs.h"
 	#include "string.h"
+	#include "containers/vector.h"
+	#include "defines.h"
 
 	using namespace owl;
 
@@ -28,7 +29,7 @@ char*			StringTools::Cpy(char* dest, const char* src)
 {
 	const unsigned int src_len = StringTools::Len(src);
 	memcpy(dest, src, src_len);
-	dest[src_len] = StringTools::NullChar;
+	dest[src_len] = 0;
 	return dest;
 }
 
@@ -36,7 +37,7 @@ char*			StringTools::Cpy(char* dest, const char* src)
 char*			StringTools::Cpy(char* dest, const char* src, const int size)
 {
 	memcpy(dest, src, size);
-	dest[size] = StringTools::NullChar;
+	dest[size] = 0;
 	return dest;
 }
 
@@ -67,7 +68,7 @@ char*			StringTools::IToS(int n, char* str)
 		*itr++ = '0' + digit;
 		n -= k * digit;
 	}
-	*itr = StringTools::NullChar;
+	*itr = 0;
 	return str;
 }
 
@@ -103,7 +104,7 @@ bool			StringTools::CaseCmp(const char* a, const char* b)
 	return res;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 String			StringTools::Format(const char* str_format, va_list varg)
 {
 	char buf[4096];
@@ -117,7 +118,7 @@ String			StringTools::Format(const char* str_format, va_list varg)
 	return String(buf);
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 unsigned long int StringTools::Hash(const char* str)
 {
 	unsigned long int h = 0;
@@ -127,122 +128,98 @@ unsigned long int StringTools::Hash(const char* str)
 	return h;
 }
 
-
-//-----------------------------------------------------------------------------
+//! String class
+//---------------------------------------------------------------------------
 const char		String::operator [] (const int i) const
 {
 	if (i < 0 || i >= Size())
 		return 0;
-	return m_str[i];
+	return ptr[i];
 }
 
-//-----------------------------------------------------------------------------
-String&			String::operator = (const String& b)
-{	return operator=(b.m_str);	}
-
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 String&			String::operator = (const char* str)
 {
 	if (!str)
 	{
-		m_str = NULL;
+		ptr = 0;
 		return *this;
 	}
 
 	Alloc(St::Len(str));
-	St::Cpy(m_str, str);
+	St::Cpy(ptr, str);
 
 	return *this;
 }
+String&			String::operator = (const String& str)
+{	return operator = (str.ptr);	}
+//---------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-String			String::operator + (const String b)
+//---------------------------------------------------------------------------
+String			String::operator + (const char c)		{	String r = *this; r += c; return r;	}
+String			String::operator + (const char* str)	{	String r = *this; r += str; return r;	}
+String			String::operator + (const String str)	{	String r = *this; r += str.ptr; return r;	}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+void			String::operator += (const char c)
 {
-	String c = *this;
-	c += b.m_str;
-	return c;
+	const int size = Size() + 1;
+	String tmp(size);
+	St::Cpy(tmp.ptr, ptr);
+	St::Cat(tmp.ptr, &c);
+	delete [] ptr;
+	ptr = tmp.Detach();
 }
-
-//-----------------------------------------------------------------------------
-String			String::Append(const String& b)
-{	return *this + b;	}
-
-//-----------------------------------------------------------------------------
-String			String::Prepend(const String& str)
-{
-	String res(str);
-	res += m_str;
-	return res;
-}
-
-//-----------------------------------------------------------------------------
 void			String::operator += (const char* str)
 {
-	const int size = St::Len(m_str) + St::Len(str);
+	assert(str != 0);
+	const int size = St::Len(ptr) + St::Len(str);
 	String tmp_str(size);
-
-	St::Cpy(tmp_str.m_str, m_str);
-	St::Cat(tmp_str.m_str, str);
-
-	delete[] m_str;
-	m_str = tmp_str.Detach();
+	St::Cpy(tmp_str.ptr, ptr);
+	St::Cat(tmp_str.ptr, str);
+	delete[] ptr;
+	ptr = tmp_str.Detach();
 }
-
-//-----------------------------------------------------------------------------
 void			String::operator += (const String& b)
-{	*this += b.m_str;	}
+{	*this += b.ptr;	}
+//---------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-bool			String::operator == (const char* str) const
-{	return St::Cmp(m_str, str);	}
+//---------------------------------------------------------------------------
+bool			String::operator == (const char* _str) const	{	return St::Cmp(ptr, _str);	}
+bool			String::operator == (const String& b) const		{	return *this == b.cStr();	}
+//---------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-bool			String::operator == (const String& b) const
-{	return *this == b.cStr();	}
+//---------------------------------------------------------------------------
+bool			String::operator < (const String& _str) const
+{	return strcmp(ptr, _str.cStr()) < 0;	}
 
-//-----------------------------------------------------------------------------
-bool			String::operator < (const String& str) const
-{	return strcmp(m_str, str.cStr()) < 0;	}
-
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 bool			String::Alloc(const int size)
 {
-	delete [] m_str;
-	m_str = new char[size + 1];
-	if (!m_str)
+	delete [] ptr;
+	ptr = new char[size + 1];
+	if (!ptr)
 		return false;
 	for (int i = 0; i < size + 1; i++)
-		m_str[i] = 0;
+		ptr[i] = 0;
 	return true;
 }
 
 //---------------------------------------------------------------------------
 char*			String::Begin() const
-{	return &m_str[0];	}
+{	return &ptr[0];	}
 
-/*
 //---------------------------------------------------------------------------
-bool			bString::contain(const char* _code)
-{
-	int code_len = strLen(_code);
-	if (len() < code_len)
-		return false;
+String			String::Append(const String& str)	{	return *this + str;	}
+String			String::Prepend(const String& str)	{	String res(str); res += ptr; return res;	}
+//---------------------------------------------------------------------------
 
-// 	for (int i = 0; i < len() - 1; ++i)
-// 	{
-// 		if (str[i] == *_code)
-// 		{
-// 			for ()
-// 		}
-// 	}
-}
-*/
-
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 bool			String::CaseCmp(const String& b) const
-{	return St::CaseCmp(m_str, b.cStr());	}
+{	return St::CaseCmp(ptr, b.cStr());	}
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 bool			String::Compare(const int pos, const int len, const char* code)
 {
 	int str_len = Size();
@@ -251,38 +228,38 @@ bool			String::Compare(const int pos, const int len, const char* code)
 	
 	for (int i = 0; i < len; ++i)
 	{
-		if (m_str[pos + i] != code[i])
+		if (ptr[pos + i] != code[i])
 			return false;
 	}
 	return true;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 char*			String::Detach()
 {
-	char* tmp_str = m_str;
-	m_str = NULL;
+	char* tmp_str = ptr;
+	ptr = 0;
 	return tmp_str;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 char*			String::End() const
-{	return &m_str[Size()];	}
+{	return &ptr[Size()];	}
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 String			String::Erase(const int pos)
 {
 	String tmp_str;
 	tmp_str.Alloc(pos);
 
-	St::Cpy(tmp_str.m_str, m_str, pos);
+	St::Cpy(tmp_str.ptr, ptr, pos);
 
-	delete[] m_str;
-	m_str = tmp_str.Detach();
+	delete[] ptr;
+	ptr = tmp_str.Detach();
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 String			String::Erase(const int pos, int len)
 {
 	int str_len = Size();
@@ -303,49 +280,75 @@ String			String::Erase(const int pos, int len)
 	int len_b = str_len - len_a - len;
 	tmp_str.Alloc(len_a + len_b);
 
-	St::Cpy(tmp_str.m_str, m_str, len_a);
+	St::Cpy(tmp_str.ptr, ptr, len_a);
 	if (len_b > 0)
 	{
 		int offset_b = len_a + len;
-		St::Cat(tmp_str.m_str, m_str + offset_b);
+		St::Cat(tmp_str.ptr, ptr + offset_b);
 	}
 
-	delete [] m_str;
-	m_str = tmp_str.Detach();
+	delete [] ptr;
+	ptr = tmp_str.Detach();
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 const int		String::FindFirstOf(const char* code)
 {
-	int str_len = Size();
-	for (int i = 0; i < str_len - 1; ++i)
+	int s = Size();
+	int cs = St::Len(code);
+	for (int i = 0; i < s; ++i)
 	{
-		if (m_str[i] == *code)
-		{
-			int code_len = St::Len(code);
-			for (int j = 0; j < code_len; ++j)
-			{
-				if (m_str[i + j] != code[j])
-					break;
-				if (j == code_len - 1)
-					return i;
-			}
-		}
+		if ((i + cs) > s)
+			break;
+		if (memcmp(&ptr[i], code, cs) == 0)
+			return i;
 	}
 	return -1;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+const int		String::FindFirstOfNot(const char* code)
+{
+	int s = Size();
+	int cs = St::Len(code);
+	for (int i = 0; i < s; i += cs)
+		if ((memcmp(&ptr[i], code, cs) != 0) || (i + cs) > s)
+			return i;
+	return -1;
+}
+
+//---------------------------------------------------------------------------
 const int		String::FindLastOf(const char* code)
 {
-	for (int i = Size() - 1; i >= 0; --i)
-		if (m_str[i] == *code)
+	int s = Size();
+	int cs = St::Len(code);
+	for (int i = s; i >= 0; --i)
+	{
+		int n = i - cs;
+		if (n < 0)
+			break;
+		if (memcmp(&ptr[n], code, cs) == 0)
 			return i;
+	}
 	return 0;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+const int		String::FindLastOfNot(const char* code)
+{
+	int s = Size();
+	int cs = St::Len(code);
+	for (int i = s; i >= 0; i -= cs)
+	{
+		int n = i - cs;
+		if (memcmp(&ptr[n], code, cs) != 0 || n < 0)
+			return i;
+	}
+	return 0;
+}
+
+//---------------------------------------------------------------------------
 String			String::Format(const char* str_format, ...)
 {
 	va_list varg;
@@ -363,63 +366,172 @@ String			String::Format(const char* str_format, ...)
 	return String(buff);
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 const String	String::FileExtension() const
 {
-	String p(m_str);
+	String p(ptr);
 	int n = p.FindLastOf(".") + 1;
-	return p.Keep(n, p.Size() - n);
+	p.Keep(n, p.Size() - n);
+	return p;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 const String	String::FilenameFromPath() const
 {
-	String buff(m_str);
-	int slash = buff.FindLastOf("/") + 1;
-	int ext = buff.FindLastOf(".");
-	return buff.Keep(slash, ext - slash);
+	String buf(ptr);
+	int slash = buf.FindLastOf("/") + 1;
+	int ext = buf.FindLastOf(".");
+	buf.Keep(slash, ext - slash);
+	return buf;
 }
 
-//-----------------------------------------------------------------------------
-const String	String::Keep(const int pos, const int len)
+//---------------------------------------------------------------------------
+String			String::Extract(const int pos, const int len)
 {
 	assert((pos + len) <= Size());
-
-	String tmp_str(len);
-	St::Cpy(tmp_str.m_str, m_str + pos, len);
-	delete[] m_str;
-
-	return m_str = tmp_str.Detach();
+	String s(len);
+	St::Cpy(s.ptr, ptr + pos, len);
+	return s;
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+void			String::Keep(const int pos, const int len)
+{
+	String s = Extract(pos, len);
+	delete [] ptr;
+	ptr = s.Detach();
+}
+
+//---------------------------------------------------------------------------
 const bool		String::IsEmpty() const
 {	return Size() == 0;	}
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 const bool		String::IsNull() const
-{	return m_str == NULL;	}
+{	return ptr == 0;	}
 
-//-----------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+const bool		String::IsNumeric() const
+{
+	const int size = Size();
+	for (int i = 0; i < size; ++i)
+		if (ptr[i] < '0' || ptr[i] > '9')
+			return false;
+	return true;
+}
+
+//---------------------------------------------------------------------------
+const String&	String::RemoveOccurences(const Vector<String>& occs)
+{
+	const int size = Size();
+	const int number_of_occurence = occs.Size();
+
+	struct Occurence { int	count, size; Occurence() : count(0), size(0) {} };
+	Vector<Occurence> occurences(number_of_occurence);
+
+	for (int i = 0; i < number_of_occurence; ++i)
+		occurences[i].size = occs[i].Size();
+
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < number_of_occurence; ++j)
+		{
+			if (memcmp(&ptr[i], occs[j].cStr(), occurences[j].size) == 0)
+			{
+				i += occurences[j].size - 1;
+				occurences[j].count++;
+			}
+		}
+	}
+
+	int new_size = size;
+	for (int i = 0; i < number_of_occurence; ++i)
+		new_size -= occurences[i].size * occurences[i].count;
+
+	if (size == new_size)
+		return *this;
+
+	Vector<char> str(new_size + 1);
+	bool write = true, quoted = false;
+	char ca = '\0', cb = '\0';
+	for (int i = 0, it = 0; i < size; ++i)
+	{
+		cb = ptr[i];
+		if (ca != '\\' && cb == '"')
+			quoted = !quoted;
+
+		if (!quoted)
+		{
+			for (int j = 0; j < number_of_occurence; ++j)
+			{
+				if (memcmp(&cb, occs[j].cStr(), occurences[j].size) == 0)
+				{
+					i += occurences[j].size - 1;
+					write = false;
+					break;
+				}
+			}
+		}
+		if (write)
+			str[it++] = cb;
+		else
+			write = true;
+		ca = cb;
+	}
+
+	delete [] ptr;
+	ptr = str.Detach();
+
+	return *this;
+}
+
+//---------------------------------------------------------------------------
 const int		String::Size() const
-{	return St::Len(m_str);	}
+{	return St::Len(ptr);	}
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 void			String::ToLower()
 {
-	if (m_str)
+	if (ptr)
 		for (int i = 0; i < Size(); i++)
-			m_str[i] = tolower(m_str[i]);
+			ptr[i] = tolower(ptr[i]);
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 void			String::ToUpper()
 {
-	if (m_str)
+	if (ptr)
 		for (int i = 0; i < Size(); i++)
-			m_str[i] = toupper(m_str[i]);
+			ptr[i] = toupper(ptr[i]);
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+bool			String::IsCharInArray(char needle, const char* haystack)
+{
+	int s = St::Len(haystack);
+	for (int i = 0; i < s; ++i)
+		if (needle == haystack[i])
+			return true;
+	return false;
+}
+
+//! Trimmed character policy
+//---------------------------------------------------------------------------
+struct			TrimmedCharactersPolicy_All		{	static const char* val;	};
+struct			TrimmedCharactersPolicy_Spaces	{	static const char* val;	};
+
+const char*		TrimmedCharactersPolicy_All::val	= " \t\n\r\v";
+const char*		TrimmedCharactersPolicy_Spaces::val	= " ";
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+void			String::TrimAll()
+{	Trim<TrimmedCharactersPolicy_All>();	}
+void			String::TrimSpaces()
+{	Trim<TrimmedCharactersPolicy_Spaces>();	}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 const String&	String::Unquotify()
-{	return *this = Keep(1, Size() - 2);	}
+{	return *this = Extract(1, Size() - 2);	}

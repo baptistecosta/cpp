@@ -21,7 +21,7 @@ private:
 
 public:
 
-		FileSystem() : f(NULL)	{}
+		FileSystem() : f(0)	{}
 		~FileSystem();
 
 const	bool					Open(const String& path);

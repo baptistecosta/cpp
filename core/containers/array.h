@@ -16,77 +16,75 @@ template<class T>	class	Array
 {
 protected:
 
-		T*					m_cells;
-		int					m_size;
+		T*					cells;
+		int					size;
 
 public:
 
 		Array(int size = 0)
 		{
-			m_cells = null_ptr;
+			cells = null_ptr;
 			if (size > 0)
 			{
-				alloc(size);
-				m_size = size;
+				Alloc(size);
+				size = size;
 			}
 		}
 
 		~Array()
-		{	
-			clear();
-		}
+		{	Clear();	}
 
 		T&					operator []	(int index)
-		{	return m_cells[index];	}
-const	T&					operator []	(int index) const
-		{	return m_cells[index];	}
+		{	return cells[index];	}
+		const T&			operator []	(int index) const
+		{	return cells[index];	}
 
-		bool				alloc(int size)
+		bool				Alloc(int _size)
 		{
-			delete [] m_cells;
-			return (m_cells = new T[size]) ? true : false;
+			delete [] cells;
+			return (cells = new T[_size]) ? true : false;
 		}
 
-		void				clear()
+		void				Clear()
 		{
-			delete [] m_cells;
-			m_cells = null_ptr;
+			delete [] cells;
+			cells = null_ptr;
 		}
 
-		void				resize(int size)
+		void				Resize(int _size)
 		{
-			T* temp = new T[size];
+			T* temp = new T[_size];
 			if (!temp)
 				return;
 
-			int min = size < m_size ? size : m_size;
+			int min = _size < size ? _size : size;
 			
 			for (int i = 0; i < min; i++)
-				temp[i] = m_cells[i];
+				temp[i] = cells[i];
 
-			m_size = size;
+			size = _size;
 
-			if (m_cells != 0)
-				delete [] m_cells;
+			if (cells != 0)
+				delete [] cells;
 
-			m_cells = temp;
+			cells = temp;
 		}
 
-		void				insert(T item, int index)
+		void				Insert(T item, int index)
 		{
-			for (int i = m_size - 1; i > index; i--)
-				m_cells[i] = m_cells[i - 1];
-			m_cells[index] = item;
+			for (int i = size - 1; i > index; i--)
+				cells[i] = cells[i - 1];
+			cells[index] = item;
 		}
 
-		void				remove(int index)
+		void				Remove(int index)
 		{
-			for (int i = index + 1; i < m_size; i++)
-				m_cells[i - 1] = m_cells[i];
+			for (int i = index + 1; i < size; i++)
+				cells[i - 1] = cells[i];
 		}
 
-const	int					size() const
-		{	return m_size;	}
+		const int			Size() const
+		{	return size;	}
 };
 
 }		// owl

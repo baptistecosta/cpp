@@ -19,43 +19,42 @@ template
 >
 class SharedPtr
 {
-		T*				m_ptr;
+		T*				ptr;
 
 public:
-		SharedPtr()							:	m_ptr(NULL)				{}
-		SharedPtr(T* ptr)					:	m_ptr(NULL)				{	init(ptr);	}
-		SharedPtr(const SharedPtr& shptr)	:	m_ptr(shptr.cPtr())		{	init(shptr.cPtr());	}
+		SharedPtr()							:	ptr(0)			{}
+		SharedPtr(T* ptr)					:	ptr(0)			{	init(ptr);	}
+		SharedPtr(const SharedPtr& shptr)	:	ptr(0)			{	init(const_cast<T*>(shptr.Raw()));	}
 
 		~SharedPtr()
-		{
-			RefCountingPolicy<T*>::Decrement(m_ptr);
-		}
+		{	RefCountingPolicy<T*>::Decrement(ptr);	}
 
 private:
-		void			init(T* ptr)
+		void			init(T* _ptr)
 		{
-			if (m_ptr = ptr)
-				RefCountingPolicy<T*>::Increment(m_ptr);
+			if (ptr = _ptr)
+				RefCountingPolicy<T*>::Increment(ptr);
 		}
 
 public:
 		//!	Operators
-		T*				operator -> ()									{	return m_ptr;	}
-		T&				operator *	()									{	return *m_ptr;	}
-		SharedPtr&		operator =	(const SharedPtr& shptr)			{	return *this = shptr.cPtr();	}
-		SharedPtr&		operator =	(T* ptr)
+		T*				operator -> ()							{	return ptr;	}
+		const T*		operator -> () const					{	return ptr;	}
+		T&				operator *	()							{	return *ptr;	}
+		SharedPtr&		operator =	(const SharedPtr& shptr)	{	return *this = const_cast<T*>(shptr.Raw());	}
+		SharedPtr&		operator =	(T* _ptr)
 		{
-			SharedDataTools<T*>::Copy(ptr, m_ptr);
+			SharedDataTools<T*>::Copy(_ptr, ptr);
 			return *this;
 		}
 		
 		//!	Get raw pointer.
-		T*				cPtr()											{	return m_ptr;	}
-const	T*				cPtr() const									{	return m_ptr;	}
+		T*				Raw()									{	return ptr;	}
+		const T*		Raw() const								{	return ptr;	}
 		//!	Is pointer non null.
-const	bool			isValid() const									{	return m_ptr != NULL;	}
+		const bool		isValid() const							{	return ptr != 0;	}
 		//!	Is pointer null.
-const	bool			isNull() const									{	return m_ptr == NULL;	}
+		const bool		isNull() const							{	return ptr == 0;	}
 };
 
 }		// owl

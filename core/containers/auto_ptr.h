@@ -6,7 +6,7 @@
 #ifndef __AUTO_PTR__
 #define __AUTO_PTR__
 
-	#include "typedefs.h"
+	#include "defines.h"
 
 namespace owl {
 
@@ -20,11 +20,11 @@ private:
 public:
 	
 		//---------------------------------------------------------------------
-		AutoPtr(T* _p = NULL)	:	p(_p)	{}
+		AutoPtr(T* _p = 0) : p(_p)	{}
 		~AutoPtr()
 		{
 			delete p;
-			p = NULL;
+			p = 0;
 		}
 		
 		//---------------------------------------------------------------------
@@ -42,7 +42,7 @@ public:
 			{
 				delete p;
 				p = _p;
-				_p = NULL;
+				_p = 0;
 			}
 			return p;
 		}
@@ -54,16 +54,16 @@ public:
 		//---------------------------------------------------------------------
 		T*					cPtr()
 		{	return p;	}
-		T*					detach()
+		T*					Detach()
 		{
 			T* d = p;
-			p = NULL;
+			p = 0;
 			return d;
 		}
-		bool				isNull() const
-		{	return p == NULL;	}
-		bool				isValid() const
-		{	return p != NULL;	}
+		const bool			IsNull() const
+		{	return p == 0;	}
+		const bool			IsValid() const
+		{	return p != 0;	}
 };
 
 }		// owl

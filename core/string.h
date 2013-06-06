@@ -7,6 +7,7 @@
 #define __STRING__
 
 	#include <stdarg.h>
+	#include "containers/vector.h"
 
 namespace owl {
 
@@ -50,39 +51,42 @@ class	String
 {
 private:
 
-		char*				m_str;
+		char*				ptr;
 
 public:
 		//---------------------------------------------------------------------
-		String()						: m_str(0)		{}
-		String(const String& b)			: m_str(0)		{	operator = (b);	}
-		String(const char* str)			: m_str(0)		{	operator = (str);	}
-		explicit String(const int size)	: m_str(0)		{	Alloc(size);	}
+		String()						: ptr(0)		{}
+		String(const String& b)			: ptr(0)		{	operator = (b);	}
+		String(const char* _str)		: ptr(0)		{	operator = (_str);	}
+		explicit String(const int size)	: ptr(0)		{	Alloc(size);	}
 
-		~String()										{	delete [] m_str;	}
+		~String()										{	delete [] ptr;	}
 
 		//---------------------------------------------------------------------
 		const char			operator [] (const int i) const;
 
-		String&				operator =	(const String& b);
-		String&				operator =	(const char* str);
-		String				operator +	(const String b);
+		String&				operator =	(const char*);
+		String&				operator =	(const String&);
+		String				operator +	(const char c);
+		String				operator +	(const char*);
+		String				operator +	(const String);
 
-		void				operator +=	(const char* str);
-		void				operator +=	(const String& b);
-		bool				operator == (const char* str) const;
-		bool				operator == (const String& str) const;
+		void				operator +=	(const char);
+		void				operator +=	(const char*);
+		void				operator +=	(const String&);
+		bool				operator == (const char*) const;
+		bool				operator == (const String&) const;
 
-		bool				operator <	(const String& str) const;
+		bool				operator <	(const String&) const;
 
 		//---------------------------------------------------------------------
 		bool				Alloc(const int size);
-		String				Append(const String& b);
+		String				Append(const String&);
 		char*				Begin() const;
-		bool				CaseCmp(const String& b) const;
+		bool				CaseCmp(const String&) const;
 		bool				Compare(const int pos, const int len, const char* code);
-		char*				cStr()						{	return m_str;	};
-		const char*			cStr() const				{	return m_str;	};
+		char*				cStr()						{	return ptr;	};
+		const char*			cStr() const				{	return ptr;	};
 //		bool				contain(const char* _code);
 		// The class won't be responsible anymore of the object pointed by str.
 		// The string object won't be deleted when the destructor is called.
@@ -90,23 +94,59 @@ public:
 		char*				End() const;
 		String				Erase(const int pos);
 		String				Erase(const int pos, int size);
-		const int			FindFirstOf(const char* code);
-		const int			FindLastOf(const char* code);
+		const int			FindFirstOf(const char*);
+		const int			FindFirstOfNot(const char*);
+		const int			FindLastOf(const char*);
+		const int			FindLastOfNot(const char*);
 		
 		const String		FileExtension() const;
 		const String		FilenameFromPath() const;
-		const String		Keep(const int pos, const int size);
+		String				Extract(const int pos, const int size);
+		void				Keep(const int pos, const int size);
 		const bool			IsEmpty() const;
 		const bool			IsNull() const;
-		String				Prepend(const String& str);
+		const bool			IsNumeric() const;
+		String				Prepend(const String&);
+		const String&		RemoveOccurences(const Vector<String>&);
 		const int			Size() const;
 		void				ToLower();
 		void				ToUpper();
+		bool				IsCharInArray(char needle, const char* haystack);
+		void				TrimAll();
+		void				TrimSpaces();
 		const String&		Unquotify();
 
 		// Format specifier: http://www.cplusplus.com/reference/clibrary/cstdio/printf/
 static	String				Format(const char* str_format, ...);
+
+private:
+		template<class HaystackCharacter> void Trim();
+
 };
+
+//---------------------------------------------------------------------------
+template<class HaystackCharacter> void owl::String::Trim()
+{
+	int start = 0, end = 0, size = Size();
+	for (int i = 0; i < size; ++i)
+	{
+		if (!IsCharInArray(ptr[i], HaystackCharacter::val))
+		{
+			start = i;
+			break;
+		}
+	}
+	for (int i = size - 1; i >= 0; --i)
+	{
+		if (!IsCharInArray(ptr[i], HaystackCharacter::val))
+		{
+			end = i;
+			break;
+		}
+	}
+	int len = end - start + 1;
+	Keep(start, len);
+}
 
 }		// owl
 #endif	// __STRING__
