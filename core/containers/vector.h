@@ -130,7 +130,7 @@ public:
 		const T&		operator []	(int index) const
 		{	return data[index];	}
 
-		Vector<T>&		operator << (const T &o)
+		Vector&			operator << (const T &o)
 		{
 			Push(o);
 			return *this;

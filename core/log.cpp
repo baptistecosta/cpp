@@ -26,7 +26,7 @@ void			Log::i(const char* format, ...)
 		va_list varg;
 		va_start(varg, format);
 		String str = StringTools::Format(format, varg);
-		String out = String::Format("%s\n", str);
+		String out = String::Format("%s\n", str.cStr());
 		va_end(varg);
 
 		IO::Print(out.cStr());
@@ -44,7 +44,7 @@ void			Log::e(const char* format, ...)
 		va_list varg;
 		va_start(varg, format);
 		String str = StringTools::Format(format, varg);
-		String out = String::Format("Error: %s\n", str);
+		String out = String::Format("Error: %s\n", str.cStr());
 		va_end(varg);
 
 		IO::Print(out.cStr());
@@ -62,7 +62,7 @@ void			Log::w(const char* format, ...)
 		va_list varg;
 		va_start(varg, format);
 		String str = StringTools::Format(format, varg);
-		String out = String::Format("Warning: %s\n", str);
+		String out = String::Format("Warning: %s\n", str.cStr());
 		va_end(varg);
 
 		IO::Print(out.cStr());

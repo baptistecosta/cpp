@@ -57,7 +57,7 @@ public:
 		//---------------------------------------------------------------------
 		String()						: ptr(0)		{}
 		String(const String& b)			: ptr(0)		{	operator = (b);	}
-		String(const char* _str)		: ptr(0)		{	operator = (_str);	}
+		String(const char* str)			: ptr(0)		{	operator = (str);	}
 		explicit String(const int size)	: ptr(0)		{	Alloc(size);	}
 
 		~String()										{	delete [] ptr;	}
