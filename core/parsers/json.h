@@ -14,6 +14,10 @@
 namespace owl {
 
 //!
+struct	JSONArray;
+struct	JSONString;
+
+//!
 struct	JSONData	:	public SharedObject
 {
 		enum
@@ -25,18 +29,19 @@ struct	JSONData	:	public SharedObject
 			TypeBool
 		};
 
-		uint				type;
+		uint				type, level;
 		JSONData*			parent;
 
 		JSONData(uint _type = 0, JSONData* _parent = 0);
+virtual	~JSONData()
+		{
+			Log::i("JSONData T=\"%d\" L=\"%d\" << destructor called", type, level + 1);
+		}
 
 		JSONData&			operator = (const JSONData&);
 
 virtual	const String		ToString();
 };
-
-//!
-struct	JSONArray;
 
 //!
 struct	JSONObject : public JSONData
@@ -46,9 +51,9 @@ struct	JSONObject : public JSONData
 		JSONObject();
 		JSONObject(const JSONObject&);
 
-		~JSONObject()
+virtual	~JSONObject()
 		{
-			Log::i("JSONObject >> destructor called");
+			Log::i("JSONObject << destructor called");
 		}
 
 		JSONObject&			operator = (const JSONObject&);
@@ -59,7 +64,9 @@ struct	JSONObject : public JSONData
 		const int			GetInt(const String&) const;
 		const bool			GetBool(const String&) const;
 
-		void				AddObject(const String& key, JSONData* data);
+		const JSONObject&	AddObject(const String& key, JSONObject*);
+		const JSONArray&	AddArray(const String& key, JSONArray*);
+		const JSONString&	AddString(const String& key, JSONString*);
 };
 
 //!
@@ -72,13 +79,7 @@ struct	JSONArray : public JSONData
 
 		JSONArray&			operator =	(const JSONArray&);
 
-		JSONData*			Get(const int);
-		const JSONData*		Get(const int) const;
-		const JSONObject&	GetObject(const int) const;
-		const JSONArray&	GetArray(const int) const;
-		const String&		GetString(const int) const;
-		const int			GetInt(const int) const;
-		const bool			GetBool(const int) const;
+		const int			Size() const				{	return val.Size();	}
 
 		template<class T> void ForEach(T func)
 		{
@@ -90,7 +91,15 @@ struct	JSONArray : public JSONData
 			}
 		}
 
-		const int			Size() const				{	return val.Size();	}
+		JSONData*			Get(const int);
+		const JSONData*		Get(const int) const;
+		const JSONObject&	GetObject(const int) const;
+		const JSONArray&	GetArray(const int) const;
+		const String&		GetString(const int) const;
+		const int			GetInt(const int) const;
+		const bool			GetBool(const int) const;
+
+		const JSONString&	AddString(JSONString*);
 };
 
 //!
@@ -143,8 +152,7 @@ class	JSONReader
 		String				json, key;
 
 		int					cursor,
-							size,
-							level;
+							size;
 
 		AutoPtr<JSONData>	root;
 		JSONData			*current, *val;

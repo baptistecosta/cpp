@@ -9,9 +9,11 @@
 	
 	using namespace owl;
 
+static int		__level__ = 0;
+
 // JSONData
 //---------------------------------------------------------------------------
-JSONData::JSONData(uint _type, JSONData* _parent) : type(_type), parent(_parent) {}
+JSONData::JSONData(uint _type, JSONData* _parent) : type(_type), level(__level__), parent(_parent) {}
 
 //---------------------------------------------------------------------------
 JSONData&		JSONData::operator = (const JSONData& data)
@@ -54,16 +56,18 @@ JSONObject&		JSONObject::operator = (const JSONObject& object)
 }
 
 //---------------------------------------------------------------------------
-const JSONObject& JSONObject::GetObject(const String& key) const	{	return *static_cast<JSONObject*>(val.Find(key)->GetValue());	}
-const JSONArray& JSONObject::GetArray(const String& key) const		{	return *static_cast<JSONArray*>(val.Find(key)->GetValue());	}
-const String&	JSONObject::GetString(const String& key) const		{	return static_cast<JSONString*>(val.Find(key)->GetValue())->val;	}
-const int		JSONObject::GetInt(const String& key) const			{	return static_cast<JSONInt*>(val.Find(key)->GetValue())->val;	}
-const bool		JSONObject::GetBool(const String& key) const		{	return static_cast<JSONBool*>(val.Find(key)->GetValue())->val;	}
+const JSONObject& JSONObject::GetObject(const String& key) const		{	return *static_cast<JSONObject*>(val.Find(key)->GetValue());	}
+const JSONArray& JSONObject::GetArray(const String& key) const			{	return *static_cast<JSONArray*>(val.Find(key)->GetValue());	}
+const String&	JSONObject::GetString(const String& key) const			{	return static_cast<JSONString*>(val.Find(key)->GetValue())->val;	}
+const int		JSONObject::GetInt(const String& key) const				{	return static_cast<JSONInt*>(val.Find(key)->GetValue())->val;	}
+const bool		JSONObject::GetBool(const String& key) const			{	return static_cast<JSONBool*>(val.Find(key)->GetValue())->val;	}
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-void owl::JSONObject::AddObject(const String& key, JSONData* data)	{	val.Insert(key, data);	}
-
+const JSONObject& JSONObject::AddObject(const String& key, JSONObject* obj)			{	val.Insert(key, obj); return *obj;	}
+const JSONArray& JSONObject::AddArray(const String& key, JSONArray* array)			{	val.Insert(key, array); return *array;	}
+const JSONString& JSONObject::AddString(const String& key, JSONString* str)			{	val.Insert(key, str); return *str;	}
+//---------------------------------------------------------------------------
 
 // JSONArray
 //---------------------------------------------------------------------------
@@ -91,6 +95,9 @@ const JSONArray& JSONArray::GetArray(const int index) const			{	return *static_c
 const String&	JSONArray::GetString(const int index) const			{	return static_cast<JSONString*>(val[index])->val;;	}
 const int		JSONArray::GetInt(const int index) const			{	return static_cast<JSONInt*>(val[index])->val;	}
 const bool		JSONArray::GetBool(const int index) const			{	return static_cast<JSONBool*>(val[index])->val;	}
+
+//---------------------------------------------------------------------------
+const JSONString& owl::JSONArray::AddString(JSONString* str)		{	val.Push(str); return *str;	}
 
 // JSONString
 //---------------------------------------------------------------------------
@@ -126,7 +133,6 @@ JSONBuilder::JSONBuilder()
 JSONReader::JSONReader(const String& _json)
 	: json(_json)
 	, cursor(0)
-	, level(0)
 	, root(0)
 	, current(0)
 	, val(0)
@@ -140,12 +146,10 @@ JSONReader::JSONReader(const String& _json)
 	// Check if the first node is a JSONObject or Array
 	switch (json[cursor++])
 	{
-		case '{': current = new JSONObject(); break;
-		case '[': current = new JSONArray(); break;
+		case '{': current = new JSONObject();  Log('{');break;
+		case '[': current = new JSONArray(); Log('['); break;
 	}
 	root = current;
-
-Log('[');
 
 	// Iterate
 	char ca = 0, cb = 0;
@@ -157,11 +161,11 @@ Log('[');
 		{
 			case '{':
 			{
-level++;
 				val = new JSONObject();
 				val->parent = current;
 				AddToCurrent();
 Log(cb);
+__level__++;
 				current = val;
 				state = StateKey;
 				break;
@@ -169,10 +173,11 @@ Log(cb);
 
 			case '[':
 			{
-level++;
 				val = new JSONArray();
 				val->parent = current;
 				AddToCurrent();
+//if (current->type == JSONData::TypeObject)
+//	__level__++;
 Log(cb);
 				current = val;
 				state = StateValue;
@@ -204,7 +209,7 @@ Log(cb);
 				}
 				if (cursor < size - 1)
 					current = current->parent;
-level--;
+__level__--;
 				break;
 
 			case ',':
@@ -292,12 +297,12 @@ const String	JSONReader::ExtractValue()
 void			JSONReader::Log(char c)
 {
 	Log::Flat("Parsed character = ' %c ' >> ", c);
-	for (int i = 0; i < level; ++i)
+	for (int i = 0; i < __level__; ++i)
 		Log::Flat(" >> ");
 
 	String _c = current->ToString();
 	String _k = key.IsEmpty() ? "null" : key;
 	String _v = val ? val->ToString() : "null";
 
-	Log::i("Current = %s, Key = %s, val = %s", _c.cStr(), _k.cStr(), _v.cStr());
+	Log::i("Level = %d, Current = %s, Key = %s, val = %s", __level__, _c.cStr(), _k.cStr(), _v.cStr());
 }
