@@ -21,13 +21,13 @@ protected:
 
 public:
 
-		Array(int size = 0)
+		Array(int _size = 0)
 		{
-			cells = null_ptr;
-			if (size > 0)
+			cells = 0;
+			if (_size > 0)
 			{
-				Alloc(size);
-				size = size;
+				Alloc(_size);
+				size = _size;
 			}
 		}
 
@@ -48,7 +48,7 @@ public:
 		void				Clear()
 		{
 			delete [] cells;
-			cells = null_ptr;
+			cells = 0;
 		}
 
 		void				Resize(int _size)

@@ -23,36 +23,32 @@ static	ulong			Process(const String&);
 };
 
 //!
-template<class Key,	class Value, class HashPolicy = StringHasher>
+template<class KType,	class VType, class HashPolicy = StringHasher>
 class	HashMap
 {
 public:
 		//!
-		class Entry
+		class	Pair
 		{
-				Key				key;
-				Value			val;
+				KType			key;
+				VType			val;
 
 		public:
 
-				Entry(const Key& _key, const Value& _val) : key(_key), val(_val) {}
+				Pair(const KType& _key, const VType& _val) : key(_key), val(_val) {}
 
-				bool			operator ==	(const Entry& entry)	{	return key == entry.GetKey() && val == entry.GetValue();	}
+				bool			operator ==	(const Pair& entry)		{	return key == entry.GetKey() && val == entry.GetValue();	}
 
-				const Key&		GetKey() const						{	return key;	}
-				const Value&	GetValue() const					{	return val;	}
+				const KType&	GetKey() const						{	return key;	}
+				const VType&	GetValue() const					{	return val;	}
 
 		private:
 
-				void			SetKey(const Key& k)				{	key = k;	}
-				void			SetValue(const Value& v)			{	val = v;	}
+				void			SetKey(const KType& k)				{	key = k;	}
+				void			SetValue(const VType& v)			{	val = v;	}
 		};
 
 protected:
-
-		typedef typename	HashMap<Key, Value>::Entry	HMEntry;
-		typedef typename	List<HMEntry>::Iterator		HMIterator;
-		typedef typename	List<HMEntry>::Node			HMNode;
 
 		enum
 		{	DefaultSize	= 33	};
@@ -60,7 +56,7 @@ protected:
 		int				capacity,
 						size;
 	
-		Array<List<Entry> > buckets;
+		Array<List<Pair> > buckets;
 
 public:
 
@@ -69,26 +65,26 @@ public:
 virtual	~HashMap()
 		{	Clear();	}
 
-		const Value&	operator []	(const String& k)
+		const VType&	operator []	(const String& k)
 		{
-			Entry* e = Find(k);
+			Pair* e = Find(k);
 			assert(e);
 			return e->GetValue();
 		}
 
-virtual	void			Insert(const Key& key, const Value& val)
+virtual	void			Insert(const KType& key, const VType& val)
 		{
 			int i = GetBucketIndex(key);
-			buckets[i].Append(Entry(key, val));
+			buckets[i].Append(Pair(key, val));
 			size++;
 		}
 
-virtual	bool			Remove(const Key& key)
+virtual	bool			Remove(const KType& key)
 		{
 			int i = GetBucketIndex(key);
 			if (!buckets[i].IsEmpty())
 			{
-				for (typename List<Entry>::Iterator itr(buckets[i].GetRoot()); itr.IsValid(); ++itr)
+				for (typename List<Pair>::Iterator itr(buckets[i].GetRoot()); itr.IsValid(); ++itr)
 				{
 					if (itr.GetNode())
 					{
@@ -104,14 +100,14 @@ virtual	bool			Remove(const Key& key)
 			return false;
 		}
 
-		Entry*			Find(const Key& key) const
+		Pair*			Find(const KType& key) const
 		{
-			const List<Entry>& bucket = buckets[GetBucketIndex(key)];
+			const List<Pair>& bucket = buckets[GetBucketIndex(key)];
 			if (!bucket.IsEmpty())
 			{
-				for (typename List<Entry>::Iterator itr(bucket.GetRoot()); itr.IsValid(); ++itr)
+				for (typename List<Pair>::Iterator itr(bucket.GetRoot()); itr.IsValid(); ++itr)
 				{
-					if (typename List<Entry>::Node* node = itr.GetNode())
+					if (typename List<Pair>::Node* node = itr.GetNode())
 					{
 						String str = node->GetData().GetKey();
 						if (str == key)
@@ -131,13 +127,14 @@ virtual	void			Clear()
 
 		template <typename Functor> void ForEachItem(Functor processFunc)
 		{
+			typedef HashMap<KType, VType>::Pair HMPair;
 			for (int i = 0; i < capacity; ++i)
 			{
-				for (HMIterator itr(buckets[i].getRoot()); itr.isValid(); ++itr)
+				for (List<HMPair>::Iterator itr(buckets[i].getRoot()); itr.isValid(); ++itr)
 				{
-					if (HMNode* node = itr.getNode())
+					if (List<HMPair>::Node* node = itr.getNode())
 					{
-						if (Value val = node->getData().GetValue())
+						if (VType val = node->getData().GetValue())
 						{
 							processFunc(val);
 						}
@@ -146,9 +143,9 @@ virtual	void			Clear()
 			}
 		}
 
-		const Array<List<Entry> >& GetBuckets() const
+		const Array<List<Pair> >& GetBuckets() const
 		{	return buckets;	}
-		const int		GetBucketIndex(const Key& key) const
+		const int		GetBucketIndex(const KType& key) const
 		{	return HashPolicy::Process(key) % capacity;	}
 
 		const int		GetSize() const
@@ -160,15 +157,15 @@ virtual	void			Clear()
 //!
 template
 <
-	class Key,
-	class Value,
+	class KType,
+	class VType,
 	class HashPolicy = StringHasher,
 	template<class> class RefCountPolicy = StandardRefCountPolicy
 >
-class	SharedHashMap	:	public HashMap<Key, Value, HashPolicy>
+class	SharedHashMap	:	public HashMap<KType, VType, HashPolicy>
 {
-		typedef				HashMap<Key, Value, HashPolicy>	HM;
-		typedef	typename 	HM::Entry						HMEntry;
+		typedef				HashMap<KType, VType, HashPolicy>	HM;
+		typedef	typename 	HM::Pair						HMEntry;
 		typedef	typename 	List<HMEntry>::Node				ListNode;
 		typedef	typename 	List<HMEntry>::Iterator			ListIterator;
 
@@ -177,23 +174,23 @@ public:
 virtual	~SharedHashMap()
 		{	Clear();	}
 
-virtual	void			Insert(const Key& key, const Value& val)
+virtual	void			Insert(const KType& key, const VType& val)
 		{
 			if (!val)
 				return;
 
-			HashMap<Key, Value, HashPolicy>::Insert(key, val);
-			StandardRefCountPolicy<Value>::Increment(val);
+			HashMap<KType, VType, HashPolicy>::Insert(key, val);
+			StandardRefCountPolicy<VType>::Increment(val);
 		}
 
-virtual	bool			Remove(const Key& key)
+virtual	bool			Remove(const KType& key)
 		{
 			if (HMEntry* entry = Find(key))
 			{
-				Value val = entry->GetValue();
+				VType val = entry->GetValue();
 				if (!Remove(key))
 					return false;
-				StandardRefCountPolicy<Value>::Decrement(val);
+				StandardRefCountPolicy<VType>::Decrement(val);
 				return true;
 			}
 			return false;
@@ -206,13 +203,13 @@ virtual	void			Clear()
 			{
 				if (!HM::buckets[i].IsEmpty())
 				{
-					for (ListIterator itr(HM::buckets[i].GetRoot()); itr.IsValid(); ++itr)
+					for (ListIterator itr = HM::buckets[i].GetRoot(); itr.IsValid(); ++itr)
 					{
 						if (ListNode* node = itr.GetNode())
 						{
-							if (Value val = node->GetData().GetValue())
+							if (VType val = node->GetData().GetValue())
 							{
-								StandardRefCountPolicy<Value>::Decrement(val);
+								StandardRefCountPolicy<VType>::Decrement(val);
 							}
 						}
 					}

@@ -22,21 +22,27 @@ class SharedPtr
 		T*				ptr;
 
 public:
+
 		SharedPtr()							:	ptr(0)			{}
-		SharedPtr(T* ptr)					:	ptr(0)			{	init(ptr);	}
-		SharedPtr(const SharedPtr& shptr)	:	ptr(0)			{	init(const_cast<T*>(shptr.Raw()));	}
+		SharedPtr(T* ptr)					:	ptr(0)			{	Init(ptr);	}
+		SharedPtr(const SharedPtr& shptr)	:	ptr(0)			{	Init(const_cast<T*>(shptr.Raw()));	}
 
 		~SharedPtr()
-		{	RefCountingPolicy<T*>::Decrement(ptr);	}
+		{
+			if (ptr)
+				RefCountingPolicy<T*>::Decrement(ptr);
+		}
 
 private:
-		void			init(T* _ptr)
+
+		void			Init(T* _ptr)
 		{
 			if (ptr = _ptr)
 				RefCountingPolicy<T*>::Increment(ptr);
 		}
 
 public:
+
 		//!	Operators
 		T*				operator -> ()							{	return ptr;	}
 		const T*		operator -> () const					{	return ptr;	}
@@ -52,9 +58,9 @@ public:
 		T*				Raw()									{	return ptr;	}
 		const T*		Raw() const								{	return ptr;	}
 		//!	Is pointer non null.
-		const bool		isValid() const							{	return ptr != 0;	}
+		const bool		IsValid() const							{	return ptr != 0;	}
 		//!	Is pointer null.
-		const bool		isNull() const							{	return ptr == 0;	}
+		const bool		IsNull() const							{	return ptr == 0;	}
 };
 
 }		// owl

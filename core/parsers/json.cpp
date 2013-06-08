@@ -21,17 +21,17 @@ JSONData&		JSONData::operator = (const JSONData& data)
 }
 
 //---------------------------------------------------------------------------
-String			JSONData::ToString()
+const String	JSONData::ToString()
 {
 	switch (type)
 	{
-		case TypeArray: return "Array";
-		case TypeObject: return "Object";
-		case TypeString: return "String";
-		case TypeInt: return "Int";
-		case TypeBool: return "Bool";
+		case TypeArray: return String("Array");
+		case TypeObject: return String("Object");
+		case TypeString: return String("String");
+		case TypeInt: return String("Int");
+		case TypeBool: return String("Bool");
 		default:
-			return "Null";
+			return String("Null");
 	}
 }
 
@@ -60,6 +60,10 @@ const String&	JSONObject::GetString(const String& key) const		{	return static_ca
 const int		JSONObject::GetInt(const String& key) const			{	return static_cast<JSONInt*>(val.Find(key)->GetValue())->val;	}
 const bool		JSONObject::GetBool(const String& key) const		{	return static_cast<JSONBool*>(val.Find(key)->GetValue())->val;	}
 //---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+void owl::JSONObject::AddObject(const String& key, JSONData* data)	{	val.Insert(key, data);	}
+
 
 // JSONArray
 //---------------------------------------------------------------------------
@@ -93,12 +97,21 @@ const bool		JSONArray::GetBool(const int index) const			{	return static_cast<JSO
 JSONString::JSONString(const String& str) : JSONData(TypeString), val(str) {}
 
 //---------------------------------------------------------------------------
-String			JSONString::ToString()
-{	return String::Format("%s: %s", JSONData::ToString(), val);	}
-String			JSONInt::ToString()
-{	return String::Format("%s: %d", JSONData::ToString(), val);	}
-String			JSONBool::ToString()
-{	return String::Format("%s: %d", JSONData::ToString(), val ? "true" : "false");	}
+const String	JSONString::ToString()
+{
+	String s = JSONData::ToString();
+	return String().Format("%s: %s", s.cStr(), val.cStr());
+}
+const String	JSONInt::ToString()
+{
+	String s = JSONData::ToString();
+	return String().Format("%s: %d", s.cStr(), val);
+}
+const String	JSONBool::ToString()
+{
+	String s = JSONData::ToString();
+	return String().Format("%s: %d", s.cStr(), val ? "true" : "false");
+}
 //---------------------------------------------------------------------------
 
 // JSONBuilder
@@ -128,7 +141,7 @@ JSONReader::JSONReader(const String& _json)
 	switch (json[cursor++])
 	{
 		case '{': current = new JSONObject(); break;
-		case '[': current = new JSONArray(); /*state = StateValue;*/ break;
+		case '[': current = new JSONArray(); break;
 	}
 	root = current;
 
@@ -205,22 +218,17 @@ Log(cb);
 
 			default:
 			{
-//				if (state == StateValue)
-//				{
-					const String str = ExtractValue();
-					if (str.IsNumeric())
-						val = new JSONInt(atoi(str.cStr()));
-					else if (str == "true")
-						val = new JSONBool(true);
-					else if (str == "false")
-						val = new JSONBool(false);
-					else if (str == "null")
-						val = 0;
-					else
-						val = 0;
-
-//					state = StateKey;
-//				}
+				const String str = ExtractValue();
+				if (str.IsNumeric())
+					val = new JSONInt(atoi(str.cStr()));
+				else if (str == "true")
+					val = new JSONBool(true);
+				else if (str == "false")
+					val = new JSONBool(false);
+				else if (str == "null")
+					val = 0;
+				else
+					val = 0;
 				break;
 			}
 		}
@@ -286,5 +294,10 @@ void			JSONReader::Log(char c)
 	Log::Flat("Parsed character = ' %c ' >> ", c);
 	for (int i = 0; i < level; ++i)
 		Log::Flat(" >> ");
-	Log::i("Current = %s, Key = %s, val = %s", current->ToString(), key, val ? val->ToString() : "null");
+
+	String _c = current->ToString();
+	String _k = key.IsEmpty() ? "null" : key;
+	String _v = val ? val->ToString() : "null";
+
+	Log::i("Current = %s, Key = %s, val = %s", _c.cStr(), _k.cStr(), _v.cStr());
 }

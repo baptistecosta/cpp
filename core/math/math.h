@@ -45,7 +45,7 @@ void				ortho(Matrix4&, const float l, const float r, const float b, const float
 void				lookAt(Matrix4&, Vector3& pos, const Vector3& dir, const Vector3& up);
 
 
-//!	@struct	CallTraits
+//!
 template <typename T>	struct CallTraits
 {
 	template <typename U, bool big>	struct CallTraitsImpl;

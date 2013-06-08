@@ -28,11 +28,11 @@ struct	JSONData	:	public SharedObject
 		uint				type;
 		JSONData*			parent;
 
-		JSONData(uint _type, JSONData* _parent = 0);
+		JSONData(uint _type = 0, JSONData* _parent = 0);
 
 		JSONData&			operator = (const JSONData&);
 
-virtual	String				ToString();
+virtual	const String		ToString();
 };
 
 //!
@@ -46,6 +46,11 @@ struct	JSONObject : public JSONData
 		JSONObject();
 		JSONObject(const JSONObject&);
 
+		~JSONObject()
+		{
+			Log::i("JSONObject >> destructor called");
+		}
+
 		JSONObject&			operator = (const JSONObject&);
 
 		const JSONObject&	GetObject(const String&) const;
@@ -53,6 +58,8 @@ struct	JSONObject : public JSONData
 		const String&		GetString(const String&) const;
 		const int			GetInt(const String&) const;
 		const bool			GetBool(const String&) const;
+
+		void				AddObject(const String& key, JSONData* data);
 };
 
 //!
@@ -78,8 +85,8 @@ struct	JSONArray : public JSONData
 			const int s = Size();
 			for (int i = 0; i < s; ++i)
 			{
-				SharedPtr<JSONData> data = Get(i);
-				func(data.Raw());
+				JSONData* data = Get(i);
+				func(data);
 			}
 		}
 
@@ -92,7 +99,7 @@ struct	JSONString : public JSONData
 		String				val;
 		JSONString(const String&);
 
-virtual	String				ToString();
+virtual	const String		ToString();
 };
 
 //!
@@ -101,7 +108,7 @@ struct	JSONInt : public JSONData
 		int					val;
 		JSONInt(const int n) : JSONData(TypeInt), val(n) {}
 
-virtual	String				ToString();
+virtual	const String		ToString();
 };
 
 //!
@@ -110,7 +117,7 @@ struct	JSONBool : public JSONData
 		bool				val;
 		JSONBool(const bool b) : JSONData(TypeBool), val(b) {}
 
-virtual	String				ToString();
+virtual	const String		ToString();
 };
 
 
@@ -139,13 +146,20 @@ class	JSONReader
 							size,
 							level;
 
-		JSONData			*root, *current, *val;
+		AutoPtr<JSONData>	root;
+		JSONData			*current, *val;
 
 		State				state;
 
 public:
 
 		JSONReader(const String&);
+		~JSONReader()
+		{
+//			if (root)
+//				Log::i("Root ref count = %d", root->GetRef());
+//			delete root;
+		}
 
 		const bool			IsRootArray() const			{	return root->type == JSONData::TypeArray;	}
 		void				AddToCurrent() ;
@@ -153,8 +167,8 @@ public:
 		const String		ExtractValue();
 
 		const JSONData*		GetRoot() const				{	return root;	}
-		const JSONObject&	GetRootObject() const		{	return *static_cast<const JSONObject*>(root);	}
-		const JSONArray&	GetRootArray() const		{	return *static_cast<const JSONArray*>(root);	}
+		const JSONObject&	GetRootObject() const		{	return *static_cast<const JSONObject*>(root.Raw());	}
+		const JSONArray&	GetRootArray() const		{	return *static_cast<const JSONArray*>(root.Raw());	}
 
 		void				Log(char);
 };

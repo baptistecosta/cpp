@@ -12,7 +12,7 @@
 namespace owl {
 
 //!
-template<class T> class List
+template<class T>	class	List
 {
 public:
 		//!
@@ -28,8 +28,13 @@ public:
 				Node(const T& _data) : data(_data), next(0), prev(0) {}
 		
 				T&				GetData()				{	return data;	}
-				Node*			GetNext()				{	return next;	}
-				Node*			GetPrev()				{	return prev;	}
+				Node*			GetNext() const			{	return next;	}
+				Node*			GetPrev() const			{	return prev;	}
+
+				const bool		HasNext() const
+				{
+					return next != 0;
+				}
 
 		private:
 
@@ -44,7 +49,7 @@ public:
 
 		public:
 
-				Iterator(Node* node = 0)
+				Iterator(Node* node = 0) : cur(0), next(0)
 				{	Reset(node);	}
 
 				Iterator&		operator ++	()
@@ -63,7 +68,16 @@ public:
 				void			Reset(Node* node = 0)
 				{
 					cur = node;
-					next = cur ? cur->GetNext() : 0;
+					if (cur)
+					{
+						if (cur->HasNext())
+						{
+							next = cur->next;
+							return;
+						}
+					}
+					next = 0;
+//					next = cur ? (cur->next ? cur->next : 0) : 0;
 				};
 
 				bool			IsValid()				{	return cur != 0;	}
@@ -98,73 +112,73 @@ public:
 		T&				operator []	(int n) const	{	return NodeAt(n)->GetData();	}
 		T&				DataAt(int n) const			{	return NodeAt(n)->GetData();	}
 
-virtual	Node*			Append(const T& data, Node* ref_node = 0)
+virtual	Node*			Append(const T& data, Node* rfr = 0)
 		{
-			Node* new_node = new Node(data);
-			if (!new_node)
+			Node* n = new Node(data);
+			if (!n)
 				return 0;
 
-			if (!ref_node)
+			if (!rfr)
 			{
-				new_node->SetPrev(last);
+				n->SetPrev(last);
 				if (last)
-					last->SetNext(new_node);
+					last->SetNext(n);
 				else
-					root = new_node;
-				last = new_node;
+					root = n;
+				last = n;
 			}
 			else
 			{
-				if (ref_node->GetNext())
-					ref_node->GetNext()->SetPrev(new_node);
+				if (rfr->GetNext())
+					rfr->GetNext()->SetPrev(n);
 
-				new_node->SetNext(ref_node->GetNext());
-				ref_node->SetNext(new_node);
-				new_node->SetPrev(ref_node);
+				n->SetNext(rfr->GetNext());
+				rfr->SetNext(n);
+				n->SetPrev(rfr);
 
-				if (last == ref_node)
-					last = new_node;
+				if (last == rfr)
+					last = n;
 			}
 
 			size++;
-			return new_node;
+			return n;
 		}
 
-virtual	Node*			Prepend(const T& data, Node* ref_node = 0)
+virtual	Node*			Prepend(const T& data, Node* rfr = 0)
 		{
-			Node* new_node = new Node(data);
-			if (!new_node)
+			Node* n = new Node(data);
+			if (!n)
 				return 0;
 
-			if (!ref_node)
+			if (!rfr)
 			{
-				new_node->SetNext(root);
+				n->SetNext(root);
 				if (root)
-					root->SetPrev(new_node);
+					root->SetPrev(n);
 				else
-					last = new_node;
-				root = new_node;
+					last = n;
+				root = n;
 			}
 			else
 			{
-				if (ref_node->GetPrev())
-					ref_node->GetPrev()->SetNext(new_node);
-				new_node->SetPrev(ref_node->GetPrev());
-				ref_node->SetPrev(new_node);
-				new_node->SetNext(ref_node);
+				if (rfr->GetPrev())
+					rfr->GetPrev()->SetNext(n);
+				n->SetPrev(rfr->GetPrev());
+				rfr->SetPrev(n);
+				n->SetNext(rfr);
 
-				if (root == ref_node)
-					root = new_node;
+				if (root == rfr)
+					root = n;
 			}
 
 			size++;
-			return new_node;
+			return n;
 		}
 
 		T*				Insert(const T& data, int pos)
 		{
-			Node* ref_node = NodeAt(pos);
-			return ref_node ? Prepend(data, ref_node) : 0;
+			Node* rfr = NodeAt(pos);
+			return rfr ? Prepend(data, rfr) : 0;
 		}
 
 		Node*			Find(const T& data)
@@ -251,7 +265,7 @@ virtual	void			Clear()
 };
 
 //!
-template<class T> class SharedList : public List<T>
+template<class T>	class	SharedList	:	public List<T>
 {
 public:
 
@@ -262,43 +276,40 @@ virtual	~SharedList()
 
 virtual	Node*			Append(const T& data, Node* ref_node = 0)
 		{
-			T* new_node = List<T>::Append(data, ref_node);
-			if (new_node)
+			class List<T>::Node* n = List<T>::Append(data, ref_node);
+			if (n)
 				data->IncRef();
-			return new_node;
+			return n;
 		}
 
 virtual	Node*			Prepend(const T& data, Node* ref_node = 0)
 		{
-			T* new_node = List<T>::Prepend(data, ref_node);
+			class List<T>::Node* new_node = List<T>::Prepend(data, ref_node);
 			if (new_node)
 				data->IncRef();
 			return new_node;
 		}
 
-virtual	bool			Remove(Node* node)
+virtual	bool			Remove(Node* n)
 		{
-			if (!node)
+			if (!List<T>::Remove(n))
 				return false;
-	
-			T data = node->GetData();
-			if (!List<T>::Remove(node))
-				return false;
-			if (data)
-				data->DecRef();
+			if (T d = n->GetData())
+				d->DecRef();
 			return true;
 		}
 
 virtual	bool			Remove(const T& data)
 		{
-			Node* node = Find(data);
+			class List<T>::Node* node = Find(data);
 			return SharedList<T>::Remove(node);
 		}
 
 virtual	void			Clear()
 		{
-			for (Node* node = List<T>::root; node; node = node->GetNext())
-				node->GetData()->DecRef();
+			for (Node* n = List<T>::root; n; n = n->GetNext())
+				if (T d = n->GetData())
+					d->DecRef();
 			List<T>::Clear();
 		}
 };

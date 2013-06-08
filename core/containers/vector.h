@@ -23,7 +23,7 @@ static	void			OnInit(T* data, int size)
 				data[i] = 0;
 		}
 static	void			OnCopy(T*, int)	{}
-static	void			OnClear(T* data, int size)
+static	void			OnDestroy(T* data, int size)
 		{
 			for (int i = 0; i < size; ++i)
 				delete data[i];
@@ -40,18 +40,20 @@ static	void			OnInit(T* data, int size)
 			for (int i = 0; i < size; ++i)
 				data[i] = 0;
 		}
-static	void			OnCopy(T* data, int size)
+static	void			OnCopy(T* d, int size)
 		{
 			for (int i = 0; i < size; ++i)
-				data[i]->IncRef();
+				if (T _d = d[i])
+					_d->IncRef();
 		}
-static	void			OnClear(T* data, int size)
+static	void			OnDestroy(T* data, int size)
 		{
 			for (int i = 0; i < size; ++i)
-				data[i]->DecRef();
+				if (T d = data[i])
+					d->DecRef();
 		}
-static	void			OnPush(T p)		{	p->IncRef();	}
-static	void			OnPull(T p)		{	p->DecRef();	}
+static	void			OnPush(T p)		{	if (p) p->IncRef();	}
+static	void			OnPull(T p)		{	if (p) p->DecRef();	}
 };
 
 //!
@@ -59,7 +61,7 @@ template <class T>	struct StandardVectorPolicy
 {
 static	void			OnInit(T*, int) {}
 static	void			OnCopy(T*, int) {}
-static	void			OnClear(T*, int) {}
+static	void			OnDestroy(T*, int) {}
 static	void			OnPush(T) {}
 static	void			OnPull(T) {}
 };
@@ -92,7 +94,7 @@ public:
 			, size(0)
 			, capacity(DefCapacity)
 		{
-			Alloc(capacity);
+			Allocate(capacity);
 		}
 
 		Vector(const int _size)
@@ -101,34 +103,37 @@ public:
 			, size(_size)
 			, capacity(_size > DefCapacity ? _size + DefCapacity : DefCapacity)
 		{
-			Alloc(capacity);
+			Allocate(capacity);
 		}
 
 		Vector(const Vector& v)
 			: is_t_ptr(IsPointer<T>::val)
-			, data(v.data)
-			, size(v.size)
-			, capacity(v.capacity)
+			, data(0)
+			, size(0)
+			, capacity(0)
 		{
+			Allocate(v.capacity);
+			size = v.size;
+			for (int i = 0; i < capacity; ++i)
+				data[i] = v[i];
 			LifetimePolicy<T>::OnCopy(data, size);
 		}
 
 		~Vector()
-		{	Clear();	}
+		{	Destroy();	}
 
 		Vector&			operator = (const Vector& v)
 		{
-			Clear();
-			data = v.data;
+			Destroy();
+			Allocate(v.capacity);
 			size = v.size;
-			capacity = v.capacity;
+			for (int i = 0; i < capacity; ++i)
+				data[i] = v[i];
 			LifetimePolicy<T>::OnCopy(data, size);
 			return *this;
 		}
-		T&				operator []	(int index)
-		{	return data[index];	}
-		const T&		operator []	(int index) const
-		{	return data[index];	}
+		T&				operator []	(int index)				{	assert(index >= 0 && index < capacity); return data[index];	}
+		const T&		operator []	(int index) const		{	assert(index >= 0 && index < capacity); return data[index];	}
 
 		Vector&			operator << (const T &o)
 		{
@@ -136,22 +141,18 @@ public:
 			return *this;
 		}
 
-private:
-
-		bool			Alloc(int count)
+		bool			Allocate(int count)
 		{
-			delete [] data;
-			data = new T[count];
+			Destroy();
+			capacity = count;
+			data = new T[capacity];
 			if (data)
 			{
-				memset(data, 0, count);
-				LifetimePolicy<T>::OnInit(data, count);
+				LifetimePolicy<T>::OnInit(data, capacity);
 				return true;
 			}
 			return false;
 		}
-
-public:
 
 		T*				Detach()
 		{
@@ -160,11 +161,11 @@ public:
 			return t;
 		}
 
-		bool			Realloc(int _size)
+		bool			Reallocate(const int _size)
 		{
 			size = _size;
 			capacity = _size > DefCapacity ? _size + DefCapacity : DefCapacity;
-			return Alloc(capacity);
+			return Allocate(capacity);
 		}
 
 		bool			Push(T item)
@@ -188,7 +189,10 @@ public:
 		bool			IncreaseCapacity(int increase_size = DefCapacity)
 		{
 			// Create a temporary array with the proper size.
-			int new_capacity = size + increase_size;
+			if (increase_size > DefCapacity)
+				increase_size = DefCapacity;
+			int new_capacity = capacity + increase_size;
+//			int new_capacity = size + increase_size;
 			T* tmp = new T[new_capacity];
 			if (!tmp)
 				return false;
@@ -221,13 +225,13 @@ public:
 		const bool		IsNull() const
 		{	return data == 0;	}
 
-		void			Clear()
+		void			Destroy()
 		{
-			LifetimePolicy<T>::OnClear(data, size);
+			LifetimePolicy<T>::OnDestroy(data, size);
 			delete [] data;
 			data = 0;
 			size = 0;
-			capacity = DefCapacity;
+			capacity = 0;
 		}
 };
 

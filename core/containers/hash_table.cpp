@@ -10,4 +10,4 @@ using namespace owl;
 
 //-----------------------------------------------------------------------------
 unsigned long int owl::StringHasher::Process(const String& str)
-{	return owl::StringTools::Hash(str.cStr());	}
+{	return owl::String::Hash(str.cStr());	}

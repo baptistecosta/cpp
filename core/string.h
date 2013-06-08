@@ -1,127 +1,105 @@
 /**
-	Common	::	2011 - 2013
-	@author		Baptiste Costa
+	bEngine :: 2011 - 2013
+	Baptiste Costa
 */
 
-#ifndef __STRING__
-#define __STRING__
+#ifndef	__OWL_CORE_BSTRING__
+#define	__OWL_CORE_BSTRING__
 
-	#include <stdarg.h>
 	#include "containers/vector.h"
 
 namespace owl {
 
-class	String;
-
 //!
-typedef	struct	StringTools
+class	String	:	public	SharedObject
 {
-		enum
-		{	NullChar	=	0	};
-
-		//! Numeration system base
-		enum	NumSysBase
-		{
-			Binary		=	2,
-			Decimal		=	10,
-			Hexadecimal	=	16
-		};
-
-		//!	Integer to string max length
-		enum	IToS
-		{	MaxLen	=	64	};
-
-static	int					Len(const char* cstr);
-static	char*				Cpy(char* dest, const char* src);
-static	char*				Cpy(char* dest, const char* src, const int length);
-static	char*				Cat(char* dest, const char* src);
-static	bool				Cmp(const char* a, const char* b);
-static	bool				CaseCmp(const char* a, const char* b);
-static	char*				IToS(int val, char* buf_start_addr);
-static	String				IToS(int n);
-
-		//! Format specifier: http://www.cplusplus.com/reference/clibrary/cstdio/printf/
-static	String				Format(const char* str_format, va_list varg);
-
-static	unsigned long int	Hash(const char* str);
-} St;
-
-//!
-class	String
-{
-private:
-
-		char*				ptr;
+		Vector<char>		v;
 
 public:
-		//---------------------------------------------------------------------
-		String()						: ptr(0)		{}
-		String(const String& b)			: ptr(0)		{	operator = (b);	}
-		String(const char* str)			: ptr(0)		{	operator = (str);	}
-		explicit String(const int size)	: ptr(0)		{	Alloc(size);	}
 
-		~String()										{	delete [] ptr;	}
+		String();
+		String(const String& s);
+		String(const char* s);
+		explicit String(const int size);
+		~String()															{	Destroy();	}
 
-		//---------------------------------------------------------------------
-		const char			operator [] (const int i) const;
+		String&				operator +=	(const char);
+		String&				operator += (const String&);
+		String&				operator += (const char*);
+		String&				operator <<	(const char c)						{	*this += c;	return *this;	}
+		String&				operator << (const String& s)					{	*this += s;	return *this;	}
+		String&				operator << (const char* s)						{	*this += s; return *this;	}
 
-		String&				operator =	(const char*);
 		String&				operator =	(const String&);
-		String				operator +	(const char c);
-		String				operator +	(const char*);
-		String				operator +	(const String);
+		String&				operator =	(const char*);
+		String				operator +	(const char c) const				{	String r = *this; r += c; return r;	}
+		String				operator +	(const String& s) const				{	String r = *this; r += s; return r;	}
+		String				operator +	(const char* s) const				{	String r = *this; r += s; return r;	}
 
-		void				operator +=	(const char);
-		void				operator +=	(const char*);
-		void				operator +=	(const String&);
-		bool				operator == (const char*) const;
-		bool				operator == (const String&) const;
+		char				operator []	(const int i);
+		const char			operator []	(const int i) const;
 
-		bool				operator <	(const String&) const;
+		const bool			operator ==	(const String& s) const				{	return Equals(s);	}
+		const bool			operator ==	(const char* s) const				{	return Equals(s);	}
 
-		//---------------------------------------------------------------------
-		bool				Alloc(const int size);
-		String				Append(const String&);
-		char*				Begin() const;
-		bool				CaseCmp(const String&) const;
-		bool				Compare(const int pos, const int len, const char* code);
-		char*				cStr()						{	return ptr;	};
-		const char*			cStr() const				{	return ptr;	};
-//		bool				contain(const char* _code);
-		// The class won't be responsible anymore of the object pointed by str.
-		// The string object won't be deleted when the destructor is called.
+		bool				Allocate(const int size)						{	return v.Allocate(size);	}
+		void				Clear();
+		void				Destroy()										{	v.Destroy();	}
+
 		char*				Detach();
-		char*				End() const;
-		String				Erase(const int pos);
-		String				Erase(const int pos, int size);
-		const int			FindFirstOf(const char*);
-		const int			FindFirstOfNot(const char*);
-		const int			FindLastOf(const char*);
-		const int			FindLastOfNot(const char*);
-		
+		const bool			Equals(const String& s) const					{	return Equals(s.cStr());	}
+		const bool			Equals(const char* s) const						{	return Equals(this->cStr(), s);	}
+		const bool			IEquals(const String& s) const					{	return IEquals(s.cStr());	}
+		const bool			IEquals(const char* s) const					{	return IEquals(this->cStr(), s);	}
+		String				Extract(const int pos, const int len) const;
 		const String		FileExtension() const;
 		const String		FilenameFromPath() const;
-		String				Extract(const int pos, const int size);
-		void				Keep(const int pos, const int size);
-		const bool			IsEmpty() const;
-		const bool			IsNull() const;
+		const int			FindFirstOf(const char*) const;
+		const int			FindFirstOfNot(const char*) const;
+		const int			FindLastOf(const char*) const;
+		const int			FindLastOfNot(const char*) const;
+		void				Keep(const int pos, const int len)				{	*this = Extract(pos, len);	}
+		const bool			IsEmpty() const									{	return v.Size() == 0;	}
 		const bool			IsNumeric() const;
-		String				Prepend(const String&);
-		const String&		RemoveOccurences(const Vector<String>&);
-		const int			Size() const;
+		const String&		RemoveOccurences(const Vector<String>& occurences);
+		const int			Size() const									{	return v.Size();	}
 		void				ToLower();
 		void				ToUpper();
-		bool				IsCharInArray(char needle, const char* haystack);
 		void				TrimAll();
 		void				TrimSpaces();
-		const String&		Unquotify();
 
-		// Format specifier: http://www.cplusplus.com/reference/clibrary/cstdio/printf/
-static	String				Format(const char* str_format, ...);
+		char*				cStr()											{	return v.GetData();	}
+		const char*			cStr() const									{	return v.GetData();	}
 
 private:
+
 		template<class HaystackCharacter> void Trim();
 
+public:
+
+static	int					Length(const char*);
+static	void				Copy(String& dest, const char* src, const int len);
+static	void				Copy(char* dest, const char* src);
+static	void				Copy(char* dest, const char* src, const int len);
+
+		// Pointer to the destination array, which should contain a C string,
+		// and be large enough to contain the concatenated resulting string.
+static	void				Concatenate(char* dest, const char* src);
+static	String				Concatenate(const char* a, const char* b);
+
+static	const bool			Equals(const char*, const char*);
+static	const bool			IEquals(const char*, const char*);
+
+		// Format specifier: http://www.cplusplus.com/reference/clibrary/cstdio/printf/
+static	String				Format(const char* format, ...);
+static	String				FormatVarg(const char* format, va_list varg);
+static	ulong				Hash(const char* str);
+
+static	bool				IsCharInArray(char needle, const char* haystack);
+
+		// Integer to string.
+static	char*				IToS(int n, char* str);
+static	String				IToS(int n);
 };
 
 //---------------------------------------------------------------------------
@@ -130,7 +108,7 @@ template<class HaystackCharacter> void owl::String::Trim()
 	int start = 0, end = 0, size = Size();
 	for (int i = 0; i < size; ++i)
 	{
-		if (!IsCharInArray(ptr[i], HaystackCharacter::val))
+		if (!IsCharInArray(v[i], HaystackCharacter::val))
 		{
 			start = i;
 			break;
@@ -138,7 +116,7 @@ template<class HaystackCharacter> void owl::String::Trim()
 	}
 	for (int i = size - 1; i >= 0; --i)
 	{
-		if (!IsCharInArray(ptr[i], HaystackCharacter::val))
+		if (!IsCharInArray(v[i], HaystackCharacter::val))
 		{
 			end = i;
 			break;
@@ -148,6 +126,5 @@ template<class HaystackCharacter> void owl::String::Trim()
 	Keep(start, len);
 }
 
-}		// owl
-#endif	// __STRING__
-
+}		//	owl
+#endif	//	__OWL_CORE_BSTRING__
