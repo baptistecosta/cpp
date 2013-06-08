@@ -46,7 +46,7 @@ virtual	const String		ToString();
 //!
 struct	JSONObject : public JSONData
 {
-		SharedHashMap<String, JSONData*> val;
+		AutoHashMap<String, JSONData>::type val;
 
 		JSONObject();
 		JSONObject(const JSONObject&);
@@ -72,7 +72,7 @@ virtual	~JSONObject()
 //!
 struct	JSONArray : public JSONData
 {
-		SharedVector<JSONData>::type val;
+		AutoVector<JSONData>::type val;
 
 		JSONArray();
 		JSONArray(const JSONArray&);
@@ -154,7 +154,7 @@ class	JSONReader
 		int					cursor,
 							size;
 
-		AutoPtr<JSONData>	root;
+		JSONData*			root;
 		JSONData			*current, *val;
 
 		State				state;
@@ -166,7 +166,8 @@ public:
 		{
 //			if (root)
 //				Log::i("Root ref count = %d", root->GetRef());
-//			delete root;
+			if (root)
+				delete root;
 		}
 
 		const bool			IsRootArray() const			{	return root->type == JSONData::TypeArray;	}
@@ -175,8 +176,8 @@ public:
 		const String		ExtractValue();
 
 		const JSONData*		GetRoot() const				{	return root;	}
-		const JSONObject&	GetRootObject() const		{	return *static_cast<const JSONObject*>(root.Raw());	}
-		const JSONArray&	GetRootArray() const		{	return *static_cast<const JSONArray*>(root.Raw());	}
+		const JSONObject&	GetRootObject() const		{	return *static_cast<const JSONObject*>(root);	}
+		const JSONArray&	GetRootArray() const		{	return *static_cast<const JSONArray*>(root);	}
 
 		void				Log(char);
 };

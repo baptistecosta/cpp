@@ -33,8 +33,8 @@ virtual	void			Log() const;
 //!	\brief	Standard reference counting policy for shared containers.
 template <class T>	struct StandardRefCountPolicy
 {
-static	void			Increment(T p)		{	if (p) p->IncRef();	}
-static	void			Decrement(T p)		{	if (p) p->DecRef();	}
+static	void			Increment(T p)		{	assert(p); p->IncRef();	}
+static	void			Decrement(T p)		{	assert(p); p->DecRef();	}
 };
 
 //!

@@ -28,6 +28,7 @@ public:
 				Node(const T& _data) : data(_data), next(0), prev(0) {}
 		
 				T&				GetData()				{	return data;	}
+				const T&		GetData() const			{	return data;	}
 				Node*			GetNext() const			{	return next;	}
 				Node*			GetPrev() const			{	return prev;	}
 

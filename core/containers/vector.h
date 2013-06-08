@@ -15,6 +15,16 @@
 namespace owl {
 
 //!
+template <class T>	struct StandardVectorPolicy
+{
+static	void			OnInit(T*, int) {}
+static	void			OnCopy(T*, int) {}
+static	void			OnDestroy(T*, int) {}
+static	void			OnPush(T) {}
+static	void			OnPull(T) {}
+};
+
+//!
 template <class T>	struct AutoVectorPolicy
 {
 static	void			OnInit(T* data, int size)
@@ -54,16 +64,6 @@ static	void			OnDestroy(T* data, int size)
 		}
 static	void			OnPush(T p)		{	if (p) p->IncRef();	}
 static	void			OnPull(T p)		{	if (p) p->DecRef();	}
-};
-
-//!
-template <class T>	struct StandardVectorPolicy
-{
-static	void			OnInit(T*, int) {}
-static	void			OnCopy(T*, int) {}
-static	void			OnDestroy(T*, int) {}
-static	void			OnPush(T) {}
-static	void			OnPull(T) {}
 };
 
 //!

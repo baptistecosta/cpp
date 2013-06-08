@@ -21,17 +21,40 @@ struct	StringHasher
 {
 static	ulong			Process(const String&);
 };
-/*
-template<class T>	struct	AutoPolicy
+
+template<class T>	struct	StandardHMPol
 {
-static	void			OnInit(T d)
+static	void			OnInit(T)		{}
+static	void			OnInsert(T)		{}
+static	bool			OnRemove(T)		{	return true;	}
+};
+
+template<class T>	struct	AutoHMPol
+{
+static	void			OnInit(T d)		{	d = 0;	}
+static	void			OnInsert(T)		{}
+static	bool			OnRemove(T d)	{	delete d; return true;	}
+};
+
+template<class T>	struct	SharedHMPol
+{
+static	void			OnInit(T d)		{	d = 0;	}
+static	void			OnInsert(T d)	{	if (d) StandardRefCountPolicy<T>::Increment(d);	}
+static	bool			OnRemove(T d)
 		{
-		
+			StandardRefCountPolicy<T>::Decrement(d);
+			return true;
 		}
 };
-*/
+
 //!
-template<class KType, class VType, class HashPolicy = StringHasher>
+template
+<
+	class KType,
+	class VType,
+	template<class> class MemoryPolicy = StandardHMPol,
+	class HashPolicy = StringHasher
+>
 class	HashMap
 {
 public:
@@ -60,7 +83,7 @@ protected:
 
 		enum
 		{	DefaultSize	= 33	};
-	
+
 		int				capacity,
 						size;
 	
@@ -69,152 +92,118 @@ protected:
 public:
 
 		HashMap(int _size = DefaultSize) : buckets(_size), capacity(_size), size(0)
-		{	OnInit();	}
+		{
+			ForEach([](KType k, VType v)
+			{	MemoryPolicy<VType>::OnInit(v);	});
+		}
 
-virtual	~HashMap()
-		{	Clear();	}
+		~HashMap()
+		{	Destroy();	}
 
-		const VType&	operator []	(const String& k)
+		HashMap&		operator = (const HashMap& m)
+		{
+			Destroy();
+			capacity = capacity;
+			m.ForEach([this](const KType& k, VType& v)
+			{	Insert(k, v);	});
+			return *this;
+		}
+		const VType&	operator []	(const String& k) const
 		{
 			Pair* e = Find(k);
 			assert(e);
 			return e->GetValue();
 		}
 
-virtual	void			OnInit() {}
-virtual	void			Insert(const KType& key, const VType& val)
+		void			Insert(const KType& key, const VType& val)
 		{
 			int i = GetBucketIndex(key);
 			buckets[i].Append(Pair(key, val));
 			size++;
+			MemoryPolicy<VType>::OnInsert(val);
 		}
 
-virtual	bool			Remove(const KType& key)
+		bool			Remove(const KType& key)
 		{
-			int i = GetBucketIndex(key);
-			if (!buckets[i].IsEmpty())
+			bool r = false;
+			ForEachNodeInBucket(key, [&](const List<Pair>& bucket, class List<Pair>::Node& n) -> bool
 			{
-				for (typename List<Pair>::Iterator itr(buckets[i].GetRoot()); itr.IsValid(); ++itr)
-				{
-					if (itr.GetNode())
-					{
-						if (itr.GetNode()->GetData().GetKey() == key)
-						{
-							buckets[i].Remove(itr.GetNode());
-							--size;
-							return true;
-						}
-					}
-				}
-			}
-			return false;
+				if (n.GetData().GetKey() == key)
+					if (MemoryPolicy<VType>::OnRemove(n.GetData().GetValue()))
+						r = const_cast<List<Pair>& >(bucket).Remove(&n);
+				return r;
+			});
+			return r;
 		}
 
 		Pair*			Find(const KType& key) const
 		{
-			const List<Pair>& bucket = buckets[GetBucketIndex(key)];
-			if (!bucket.IsEmpty())
+			Pair* p = 0;
+			ForEachNodeInBucket(key, [&](const List<Pair>& bucket, class List<Pair>::Node& n) -> bool
 			{
-				if (class List<Pair>::Node* r = bucket.GetRoot())
+				if (n.GetData().GetKey() == key)
 				{
-					for (typename List<Pair>::Iterator itr = r; itr.IsValid(); ++itr)
-					{
-						if (typename List<Pair>::Node* node = itr.GetNode())
-						{
-							String str = node->GetData().GetKey();
-							if (str == key)
-								return &itr.GetNode()->GetData();
-						}
-					}
+					p = &n.GetData();
+					return true;
 				}
-			}
-			return 0;
+				return false;
+			});
+			return p;
 		}
 
-virtual	void			Clear()
+		void			Destroy()
 		{
-			int n_size = buckets.Size();
-			for (int i = 0; i < n_size; ++i)
+			ForEach([](const KType& k, VType& v)
+			{	MemoryPolicy<VType>::OnRemove(v);	});
+			for (int i = 0; i < buckets.Size(); ++i)
 				buckets[i].Clear();
 		}
 
-		template <typename LambdaExp> void ForEach(LambdaExp func)
+		template <typename LambdaExp> void ForEach(LambdaExp func)	{	static_cast<const HashMap&>(*this).ForEach(func);	}
+		template <typename LambdaExp> void ForEach(LambdaExp func) const
 		{
-			typedef HashMap<KType, VType>::Pair HMPair;
-			for (int i = 0; i < capacity; ++i)
+			ForEachNode([&func](class List<Pair>::Node* n) -> bool
 			{
-				if (List<HMPair>::Node* r = buckets[i].GetRoot())
-				{
-					for (List<HMPair>::Iterator itr = r; itr.IsValid(); ++itr)
-					{
-						if (List<HMPair>::Node* node = itr.GetNode())
-						{
-							KType k = node->GetData().GetKey();
-							if (VType v = node->GetData().GetValue())
-								func(k, v);
-						}
-					}
-				}
-			}
+				KType k = n->GetData().GetKey();
+				if (VType v = n->GetData().GetValue())
+					func(k, v);
+				return false;
+			});
 		}
 
-		const Array<List<Pair> >& GetBuckets() const
-		{	return buckets;	}
-		const int		GetBucketIndex(const KType& key) const
-		{	return HashPolicy::Process(key) % capacity;	}
+		template <typename LambdaExp> void ForEachNode(LambdaExp func)	{	static_cast<const HashMap&>(*this).ForEachNode(func);	}
+		template <typename LambdaExp> void ForEachNode(LambdaExp func) const
+		{
+			for (int i = 0; i < capacity; ++i)
+				if (class List<Pair>::Node* r = buckets[i].GetRoot())
+					for (class List<Pair>::Iterator itr = r; itr.IsValid(); ++itr)
+						if (class List<Pair>::Node* n = itr.GetNode())
+							if (func(n))
+								return;
+		}
 
-		const int		GetSize() const
-		{	return size;	}
-		const int		GetCapacity() const
-		{	return capacity;	}
+		template <typename LambdaExp> void ForEachNodeInBucket(String key, LambdaExp func)	{	static_cast<const HashMap&>(*this).ForEachNodeInBucket(func);	}
+		template <typename LambdaExp> void ForEachNodeInBucket(String key, LambdaExp func) const
+		{
+			const List<Pair>& bucket = buckets[GetBucketIndex(key)];
+			if (!bucket.IsEmpty())
+				if (class List<Pair>::Node* r = bucket.GetRoot())
+					for (class List<Pair>::Iterator itr = r; itr.IsValid(); ++itr)
+						if (class List<Pair>::Node* n = itr.GetNode())
+							if (func(bucket, *n))
+								return;
+		}
+
+		const Array<List<Pair> >& GetBuckets() const			{	return buckets;	}
+		const int		GetBucketIndex(const KType& key) const	{	return HashPolicy::Process(key) % capacity;	}
+
+		const int		GetSize() const							{	return size;	}
+		const int		GetCapacity() const						{	return capacity;	}
 };
 
 //!
-template
-<
-	class KType,
-	class VType,
-	class HashPolicy = StringHasher,
-	template<class> class RefCountPolicy = StandardRefCountPolicy
->
-class	SharedHashMap	:	public HashMap<KType, VType, HashPolicy>
-{
-		typedef				HashMap<KType, VType, HashPolicy>	HM;
-
-public:
-
-virtual	~SharedHashMap()
-		{	Clear();	}
-
-virtual	void			Insert(const KType& key, const VType& val)
-		{
-			if (!val)
-				return;
-
-			HashMap<KType, VType, HashPolicy>::Insert(key, val);
-			StandardRefCountPolicy<VType>::Increment(val);
-		}
-
-virtual	bool			Remove(const KType& key)
-		{
-			if (HM::Pair* entry = Find(key))
-			{
-				VType val = entry->GetValue();
-				if (!Remove(key))
-					return false;
-				StandardRefCountPolicy<VType>::Decrement(val);
-				return true;
-			}
-			return false;
-		}
-
-virtual	void			Clear()
-		{
-			ForEach([](const KType& k, const VType& v)
-			{	StandardRefCountPolicy<VType>::Decrement(v);	});
-			HM::Clear();
-		}
-};
+template <class KType, class VType>	struct AutoHashMap			{	typedef	HashMap<KType, VType*, AutoHMPol>	type;	};
+template <class KType, class VType>	struct SharedHashMap		{	typedef	HashMap<KType, VType*, SharedHMPol>	type;	};
 
 }		// owl
 #endif	// __B_HASH_TABLE__
