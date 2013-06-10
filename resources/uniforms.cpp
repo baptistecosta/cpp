@@ -30,7 +30,7 @@ void			UniformWrapper::GetUniformLocation(const uint shader_program, const Strin
 	// Retourne un entier qui représente l'emplacement d'une variable "uniform" à l'intérieur d'un shader (GLuint uniform_loc).
 	m_uniform_location = glGetUniformLocation(shader_program, uniform_var_name.cStr());
 	OpenGL::CheckGLError();
-	if (Log::log && m_uniform_location == -1)
+	if (m_uniform_location == -1)
 		Log::i("Shader program: %d, glGetUniformLocation returned -1 for uniform variable name: %s", shader_program, uniform_var_name);
 }
 

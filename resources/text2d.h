@@ -47,7 +47,7 @@ public:
 		uint&				GetBuffer(uint index)			{	return buffer[index];   }
 		const uint&			GetBuffer(uint index) const		{	return buffer[index];   }
 		const uint			GetSize() const 				{	return pos.size();   }
-		Font*				GetFont()						{	return m_font.cPtr();	}
+		Font*				GetFont()						{	return m_font.Raw();	}
 
 		void				SetFont(Font* font)				{	m_font = font;	}
 };

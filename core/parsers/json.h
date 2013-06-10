@@ -10,15 +10,18 @@
 	#include "core/containers/hash_table.h"
 	#include "core/containers/shared_pointer.h"
 	#include "core/string.h"
+	#include "core/uncopyable.h"
 
 namespace owl {
 
 //!
 struct	JSONArray;
 struct	JSONString;
+struct	JSONInt;
+struct	JSONBool;
 
 //!
-struct	JSONData	:	public SharedObject
+struct	JSONData	:	public SharedObject, private Uncopyable
 {
 		enum
 		{
@@ -26,61 +29,46 @@ struct	JSONData	:	public SharedObject
 			TypeObject,
 			TypeString,
 			TypeInt,
-			TypeBool
+			TypeBool,
+			TypeNull
 		};
 
 		uint				type, level;
-		JSONData*			parent;
+		JSONData			*parent, *sons;
 
 		JSONData(uint _type = 0, JSONData* _parent = 0);
-virtual	~JSONData()
-		{
-			Log::i("JSONData T=\"%d\" L=\"%d\" << destructor called", type, level + 1);
-		}
-
-		JSONData&			operator = (const JSONData&);
 
 virtual	const String		ToString();
 };
-
 //!
 struct	JSONObject : public JSONData
 {
 		AutoHashMap<String, JSONData>::type val;
 
 		JSONObject();
-		JSONObject(const JSONObject&);
 
-virtual	~JSONObject()
-		{
-			Log::i("JSONObject << destructor called");
-		}
+		const int			Size() const				{	return val.GetSize();	}
 
-		JSONObject&			operator = (const JSONObject&);
+		JSONObject*			GetObject(const String&) const;
+		JSONArray*			GetArray(const String& key) const;
+		String				GetString(const String&) const;
+		int					GetInt(const String&) const;
+		bool				GetBool(const String&) const;
 
-		const JSONObject&	GetObject(const String&) const;
-		const JSONArray&	GetArray(const String& key) const;
-		const String&		GetString(const String&) const;
-		const int			GetInt(const String&) const;
-		const bool			GetBool(const String&) const;
-
-		const JSONObject&	AddObject(const String& key, JSONObject*);
-		const JSONArray&	AddArray(const String& key, JSONArray*);
-		const JSONString&	AddString(const String& key, JSONString*);
+		JSONObject*			AddJSONObject(const String&, JSONObject*);
+		JSONArray*			AddJSONArray(const String&, JSONArray*);
+		void				AddJSONString(const String&, JSONString*);
+		void				AddJSONInt(const String&, JSONInt*);
+		void				AddJSONBool(const String&, JSONBool*);
 };
-
 //!
 struct	JSONArray : public JSONData
 {
 		AutoVector<JSONData>::type val;
 
 		JSONArray();
-		JSONArray(const JSONArray&);
 
-		JSONArray&			operator =	(const JSONArray&);
-
-		const int			Size() const				{	return val.Size();	}
-
+		const int			Size() const			{	return val.Size();	}
 		template<class T> void ForEach(T func)
 		{
 			const int s = Size();
@@ -93,42 +81,45 @@ struct	JSONArray : public JSONData
 
 		JSONData*			Get(const int);
 		const JSONData*		Get(const int) const;
-		const JSONObject&	GetObject(const int) const;
-		const JSONArray&	GetArray(const int) const;
-		const String&		GetString(const int) const;
-		const int			GetInt(const int) const;
-		const bool			GetBool(const int) const;
+		JSONObject*			GetObject(const int) const;
+		JSONArray*			GetArray(const int) const;
+		String				GetString(const int) const;
+		int					GetInt(const int) const;
+		bool				GetBool(const int) const;
 
-		const JSONString&	AddString(JSONString*);
+		JSONArray*			AddJSONArray(JSONArray*);
+		JSONObject*			AddJSONObject(JSONObject*);
+		void				AddJSONString(JSONString*);
+		void				AddJSONInt(JSONInt*);
+		void				AddJSONBool(JSONBool*);
 };
-
 //!
 struct	JSONString : public JSONData
 {
 		String				val;
 		JSONString(const String&);
-
 virtual	const String		ToString();
 };
-
 //!
 struct	JSONInt : public JSONData
 {
 		int					val;
 		JSONInt(const int n) : JSONData(TypeInt), val(n) {}
-
 virtual	const String		ToString();
 };
-
 //!
 struct	JSONBool : public JSONData
 {
 		bool				val;
 		JSONBool(const bool b) : JSONData(TypeBool), val(b) {}
-
 virtual	const String		ToString();
 };
-
+//!
+struct	JSONNull : public JSONData
+{
+		JSONNull() : JSONData(TypeNull) {}
+virtual	const String		ToString();
+};
 
 //!
 class	JSONBuilder
@@ -136,10 +127,11 @@ class	JSONBuilder
 		String				o;
 
 public:
+		JSONBuilder(JSONData*);
+		const String&		Build()		{	return o;	}
 
-		JSONBuilder();
-
-		
+private:
+		void				ProcessNode(JSONData*);
 };
 
 //!
@@ -148,36 +140,29 @@ class	JSONReader
 		//!
 		enum	State
 		{	StateKey, StateValue	};
-
-		String				json, key;
-
-		int					cursor,
-							size;
-
-		JSONData*			root;
-		JSONData			*current, *val;
-
 		State				state;
 
-public:
+		String				json, key;
+		int					cursor, size;
 
-		JSONReader(const String&);
-		~JSONReader()
-		{
-//			if (root)
-//				Log::i("Root ref count = %d", root->GetRef());
-			if (root)
-				delete root;
-		}
+		AutoPtr<JSONData>	root;
+		JSONData			*current, *val;
 
-		const bool			IsRootArray() const			{	return root->type == JSONData::TypeArray;	}
+private:
+
 		void				AddToCurrent() ;
 		const String		ExtractString();
 		const String		ExtractValue();
 
-		const JSONData*		GetRoot() const				{	return root;	}
-		const JSONObject&	GetRootObject() const		{	return *static_cast<const JSONObject*>(root);	}
-		const JSONArray&	GetRootArray() const		{	return *static_cast<const JSONArray*>(root);	}
+public:
+
+		JSONReader(const String&);
+
+		const bool			IsRootArray() const			{	return root->type == JSONData::TypeArray;	}
+
+		JSONData*			GetRoot()					{	return root;	}
+		JSONObject*			GetRootObject()				{	return static_cast<JSONObject*>(root.Raw());	}
+		JSONArray*			GetRootArray()				{	return static_cast<JSONArray*>(root.Raw());	}
 
 		void				Log(char);
 };

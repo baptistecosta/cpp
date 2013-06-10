@@ -23,9 +23,10 @@ namespace owl {
 //!	\brief	Store a resource into a std::map container using string key value accessor.
 template <class T>	class	ResourceManager
 {
+	typedef	typename SharedHashMap<String, T>::type Map;
 private:
 
-	SharedHashMap<String, T*> cache;
+	Map				cache;
 
 public:
 
@@ -33,33 +34,33 @@ public:
 	//!	\param	id, string key value of the resource you want to find.
 	T*				find(const String& id)
 	{
-		if (SharedHashMap<String, T*>::Entry* entry = cache.find(id))
-			return entry->getValue();
+		if (Map::Pair* entry = cache.Find(id))
+			return entry->GetValue();
 		return NULL;
 	}
 
 	//!	Clean up the std::map container.
 	void			cleanUp()
-	{	cache.clear();	}
+	{	cache.Clear();	}
 
 	//!	Store a resource <T*> in the std::map container.
 	//!	\param	m, the resource you want to add.
 	T*				registerRes(T* m)
 	{
 		if (!find(m->getGuid()))
-			cache.insert(m->getGuid(), m);
+			cache.Insert(m->getGuid(), m);
 		return m;
 	}
 
-	SharedHashMap<String, T*>& getCache()
+	Map&			getCache()
 	{	return cache;	}
-	const SharedHashMap<String, T*>& getCache() const
+	const Map&		getCache() const
 	{	return cache;	}
 	
 	T*				getResource(const String& id)
 	{
-		if (SharedHashMap<String, T*>::Entry* e = cache.find(id))
-			return e->getValue();
+		if (Map::Pair* e = cache.Find(id))
+			return e->GetValue();
 		return NULL;
 	}
 };

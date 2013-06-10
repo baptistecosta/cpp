@@ -252,8 +252,8 @@ BaseImageLoader* ImageLoaderFactory::create(const String& path)
 {
 	String ext = path.FileExtension();
 
-	if		(ext.CaseCmp("tga")) return new TGALoader(path);
-	else if (ext.CaseCmp("png")) return new PNGLoader(path);
+	if		(ext.IEquals("tga")) return new TGALoader(path);
+	else if (ext.IEquals("png")) return new PNGLoader(path);
 
 	Log::e("%s, image format not supported !", path);
 	exit(1);

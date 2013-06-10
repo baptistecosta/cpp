@@ -726,7 +726,7 @@ char*			Collada::RemoveNewlineAndSpaceBeforeString(char* str)
 //---------------------------------------------------------------------------
 String			Collada::ConvertSourceString(String& str)
 {	
-	if (str.Compare(0, 1, "#"))
+	if (str[0] == '#')
 		str.Erase(0, 1);
 	return str;
 }

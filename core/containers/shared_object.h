@@ -6,6 +6,7 @@
 #ifndef __SHARED_OBJECT__
 #define __SHARED_OBJECT__
 
+	#include <assert.h>
 	#include "typedefs.h"
 
 namespace owl {

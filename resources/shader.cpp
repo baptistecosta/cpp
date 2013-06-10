@@ -97,13 +97,13 @@ void			ShaderLib::Load(const char* path, RenderingContext& ctx)
 		const char* name = Shader::GetShaderNameFromType(type);
 
 		Log::HorizontalLine();
-		__LOG("Loading shader: %s", name)
+		Log::i("Loading shader: %s", name);
 		Shader* shd = ShaderLoader::Load(type, String::Format("%s%s.vert", path, name), String::Format("%s%s.frag", path, name));
 
 		shd->InitUniformsBundles(ctx);
 		shd->GetUniformLocations();
 		shaders.Push(shd);
-		__LOG("Successfully load shader: %s", name)
+		Log::i("Successfully load shader: %s", name);
 	}
 }
 

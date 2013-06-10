@@ -37,8 +37,8 @@ void			RenderingGeometriesLib::Load(GLRenderer& renderer)
 {
 	Log::HorizontalLine(); Log::i("Loading rendering geometries...");
 
-	SharedHashMap<String, Geometry*>& map = Resources::geometries.getCache();
-	map.forEachItem([&renderer](Geometry* g)
+	SharedHashMap<String, Geometry>::type& map = Resources::geometries.getCache();
+	map.ForEach([&renderer](String k, Geometry* g)
 	{
 		RenderingGeometry* rd = renderer.ConvertToRenderingGeometry(g);
 		Log::i("Loading rendering geometry with id: %s", rd->getGuid());

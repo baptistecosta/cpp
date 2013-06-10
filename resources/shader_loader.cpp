@@ -36,8 +36,8 @@ Shader*			ShaderLoader::Load(Shader::Type type, const String& vshad_path, const 
 	__GL_CALL(glDeleteShader(vs_id))
 	__GL_CALL(glDeleteShader(fs_id))
 
-	__LOG("Program = %d", prog_id)
-	__LOG_NL()
+	Log::i("Program = %d", prog_id);
+	Log::NewLine();
 
 	return shader;
 }
@@ -48,7 +48,7 @@ void			ShaderLoader::CreateShader(const uint shader_type, const char* filename, 
 	FileSystem fs;
 	if (!fs.Open(filename))
 	{
-		__LOG_E("Could not open %s!", filename);
+		Log::e("Could not open %s!", filename);
 		exit(1);
 	}
 	shader_id = glCreateShader(shader_type);
@@ -66,7 +66,7 @@ void			ShaderLoader::CompileShader(const uint shader_id, const char* shader_src_
 
 	__GL_CALL(glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compilation_res))
 	__GL_CALL(glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_len))
-	__LOG(compilation_res ? "Compilation succeed" : "Compilation failed")
+	Log::i(compilation_res ? "Compilation succeed" : "Compilation failed");
 
 	// Check Vertex Shader
 	LogGLShaderInfo(shader_id);
@@ -75,7 +75,7 @@ void			ShaderLoader::CompileShader(const uint shader_id, const char* shader_src_
 //-----------------------------------------------------------------------------
 uint			ShaderLoader::LinkProgram(const uint vert_shader_id, const uint frag_shader_id)
 {
-	__LOG("Linking program")
+	Log::i("Linking program");
 	uint prog_id = glCreateProgram();
 #ifdef __debug__
 	OpenGL::CheckGLError();
@@ -86,7 +86,7 @@ uint			ShaderLoader::LinkProgram(const uint vert_shader_id, const uint frag_shad
 
 	__GL_CALL(glGetProgramiv(prog_id, GL_LINK_STATUS, &compilation_res))
 	__GL_CALL(glGetProgramiv(prog_id, GL_INFO_LOG_LENGTH, &info_log_len))
-	__LOG(compilation_res ? "Compilation succeed" : "Compilation failed")
+	Log::i(compilation_res ? "Compilation succeed" : "Compilation failed");
 
 	// Check the program
 	LogGLProgramInfo(prog_id);
@@ -99,13 +99,13 @@ void			ShaderLoader::LogGLShaderInfo(uint id)
 	String msg(info_log_len);
 	__GL_CALL(glGetShaderInfoLog(id, info_log_len, NULL, msg.cStr()))
 	if (!msg.IsEmpty())
-		__LOG_E(msg.cStr())
+		Log::e(msg.cStr());
 }
 void			ShaderLoader::LogGLProgramInfo(uint id)
 {
 	String msg(info_log_len);
 	__GL_CALL(glGetProgramInfoLog(id, info_log_len, NULL, msg.cStr()))
 	if (!msg.IsEmpty())
-		__LOG_E(msg.cStr())
+		Log::e(msg.cStr());
 }
 //-----------------------------------------------------------------------------

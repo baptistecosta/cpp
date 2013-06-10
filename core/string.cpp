@@ -34,12 +34,13 @@ String&			String::operator =	(const char* s)
 {
 	Destroy();
 	const int l = Length(s);
-	v.Allocate(l);
+	v.Allocate(l + 1);
 	Copy(*this, s, l);
 	return *this;
 }
 char			String::operator [] (const int i)		{	assert(i >= 0 && i < Size()); return v[i];	}
 const char		String::operator [] (const int i) const	{	assert(i >= 0 && i < Size()); return v[i];	}
+bool			String::operator < (const String& s) const	{	return Equals(s);	}
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -61,6 +62,49 @@ int				String::Length(const char* s)
 		while (*s++)
 			n++;
 	return n;
+}
+
+//---------------------------------------------------------------------------
+String			String::Erase(const int pos)
+{
+	String s;
+	s.Allocate(pos + 1);
+	Copy(&s.v[0], &v[0], pos);
+	s.v[s.Size()] = 0;
+	v = s.v;
+	return *this;
+}
+
+//---------------------------------------------------------------------------
+String			String::Erase(const int pos, int len)
+{
+	int str_len = Size();
+	int len_a = pos;
+
+	// If erase after the length of the string, return.
+	if (len_a >= str_len)
+		return *this;
+
+	// Prevent erasing after the end of the string.
+	if ((len_a + len) > str_len)
+	{
+		// Resize the erase length.
+		len = str_len - len_a;
+	}
+
+	String	s;
+	int len_b = str_len - len_a - len;
+	s.Allocate(len_a + len_b + 1);
+
+	Copy(&s.v[0], &v[0], len_a);
+	if (len_b > 0)
+	{
+		int offset_b = len_a + len;
+		Concatenate(&s.v[0], &v[0 + offset_b]);
+	}
+	s.v[s.Size()] = 0;
+	v = s.v;
+	return *this;
 }
 
 //---------------------------------------------------------------------------
@@ -217,6 +261,10 @@ void			String::ToUpper()
 		v[i] = toupper(v[i]);
 }
 //---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+const String&	String::Unquotify()
+{	return *this = Extract(1, Size() - 2);	}
 
 //---------------------------------------------------------------------------
 void			String::Copy(String& d, const char* s, const int len)

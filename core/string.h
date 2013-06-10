@@ -41,16 +41,21 @@ public:
 
 		const bool			operator ==	(const String& s) const				{	return Equals(s);	}
 		const bool			operator ==	(const char* s) const				{	return Equals(s);	}
+		bool				operator <	(const String&) const;
 
 		bool				Allocate(const int size)						{	return v.Allocate(size);	}
 		void				Clear();
 		void				Destroy()										{	v.Destroy();	}
 
 		char*				Detach();
+		const char*			Begin() const									{	return &v[0];	}
+		const char*			End() const										{	return &v[Size()];	}
 		const bool			Equals(const String& s) const					{	return Equals(s.cStr());	}
 		const bool			Equals(const char* s) const						{	return Equals(this->cStr(), s);	}
 		const bool			IEquals(const String& s) const					{	return IEquals(s.cStr());	}
 		const bool			IEquals(const char* s) const					{	return IEquals(this->cStr(), s);	}
+		String				Erase(const int pos);
+		String				Erase(const int pos, int size);
 		String				Extract(const int pos, const int len) const;
 		const String		FileExtension() const;
 		const String		FilenameFromPath() const;
@@ -59,7 +64,7 @@ public:
 		const int			FindLastOf(const char*) const;
 		const int			FindLastOfNot(const char*) const;
 		void				Keep(const int pos, const int len)				{	*this = Extract(pos, len);	}
-		const bool			IsEmpty() const									{	return v.Size() == 0;	}
+		const bool			IsEmpty() const									{	return Size() == 0;	}
 		const bool			IsNumeric() const;
 		const String&		RemoveOccurences(const Vector<String>& occurences);
 		const int			Size() const									{	return v.Size();	}
@@ -67,6 +72,7 @@ public:
 		void				ToUpper();
 		void				TrimAll();
 		void				TrimSpaces();
+		const String&		Unquotify();
 
 		char*				cStr()											{	return v.GetData();	}
 		const char*			cStr() const									{	return v.GetData();	}

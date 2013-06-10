@@ -125,7 +125,7 @@ class	LibraryControllers
 {
 public:
 
-	map<String, Controller*>	ctrl;
+	std::map< String, Controller* >	ctrl;
 
 	~LibraryControllers()
 	{	Stl::DeleteMap(ctrl);	}

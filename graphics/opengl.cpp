@@ -39,7 +39,7 @@ void			OpenGL::InitGlfw(const Vector2& screen_res)
 {
 	if (!glfwInit())
 	{
-		__LOG_E("Failed to initialize GLFW")
+		Log::e("Failed to initialize GLFW");
 		::exit(1);
 	}
 
@@ -60,12 +60,12 @@ void			OpenGL::InitGlfw(const Vector2& screen_res)
 void			OpenGL::InitGlew()
 {
 	const char* gl_version = (const char*)glGetString(GL_VERSION);
-	__LOG("OpenGL version: %s", gl_version);
+	Log::i("OpenGL version: %s", gl_version);
 	
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
-		__LOG_E("%s\n", glewGetErrorString(err))
+		Log::e("%s\n", glewGetErrorString(err));
 		DebugBreak();
 	}
 }
