@@ -180,7 +180,7 @@ const int		String::FindLastOfNot(const char* s) const
 const bool		String::IsNumeric() const
 {
 	for (int i = 0; i < Size(); ++i)
-		if (v[i] < '0' || v[i] > '9')
+		if (!IsCharInArray(v[i], "+-.0123456789eE"))
 			return false;
 	return true;
 }
