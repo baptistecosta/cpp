@@ -7,12 +7,9 @@
 #include "defines.h"
 #include "shared_object.h"
 
-namespace BCosta
-{
-namespace Core
-{
-namespace Container
-{
+namespace BCosta {
+namespace Core {
+namespace Container {
 
 //!
 template<class T>

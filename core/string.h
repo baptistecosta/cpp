@@ -2,16 +2,13 @@
 #define BCOSTA_CORE_STRING_H
 
 #include <cstdarg>
-#include "containers/vector.h"
+#include "container/vector.h"
 
 using namespace BCosta::Core::Container;
 
-namespace BCosta
-{
-namespace Core
-{
+namespace BCosta {
+namespace Core {
 
-//!
 class String : public SharedObject
 {
     Vector<char> v;
@@ -144,7 +141,7 @@ public:
 
     const bool IsNumeric() const;
 
-    const String &RemoveOccurences(const Vector <String> &occurences);
+    const String &RemoveOccurences(const Vector<String> &occurences);
 
     const int Size() const
     { return v.Size(); }

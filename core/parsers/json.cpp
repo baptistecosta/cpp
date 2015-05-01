@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 #include "json.h"
-#include "core/containers/hash_table.h"
+#include "core/container/hash_table.h"
 	
 using namespace owl;
 

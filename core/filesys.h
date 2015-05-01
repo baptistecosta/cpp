@@ -1,38 +1,42 @@
-/**
-	bEngine	::	2011 - 2012
-	@author		Baptiste Costa
-*/
+#ifndef BCOSTA_CORE_FILE_SYSTEM_H
+#define BCOSTA_CORE_FILE_SYSTEM_H
 
-#ifndef __FILE_SYSTEM__
-#define __FILE_SYSTEM__
-	
-	#include <stdio.h>
+#include <stdio.h>
 
-namespace owl {
+namespace BCosta {
+namespace Core {
 
-class	String;
+class String;
 
-//!
-class	FileSystem
+class FileSystem
 {
 private:
 
-		FILE*					f;
+    FILE *f;
 
 public:
 
-		FileSystem() : f(0)	{}
-		~FileSystem();
+    FileSystem() : f(0)
+    { }
 
-const	bool					Open(const String& path);
-const	bool					Word(String& w) const;
-const	bool					Scan(String& line) const;
-const	String					Read();
-const	int						Size() const;
-		void					Close();
+    ~FileSystem();
 
-inline	FILE*					GetFile() const				{	return f;	}
+    const bool Open(const String &path);
+
+    const bool Word(String &w) const;
+
+    const bool Scan(String &line) const;
+
+    const String Read();
+
+    const int Size() const;
+
+    void Close();
+
+    inline FILE *GetFile() const
+    { return f; }
 };
 
-}		// owl
-#endif	// __FILE_SYSTEM__
+}
+}
+#endif // BCOSTA_CORE_FILE_SYSTEM_H
