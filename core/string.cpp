@@ -38,8 +38,9 @@ String &String::operator +=(const char *s)
 {
     int len = Length(s);
     int inc = (Size() + (len + 1)) - v.GetCapacity();
-    if (inc > 0)
+    if (inc > 0) {
         v.IncreaseCapacity(inc);
+    }
     Copy(*this, s, len);
     return *this;
 }
@@ -59,40 +60,43 @@ String &String::operator =(const char *s)
     return *this;
 }
 
-char            String::operator [](const int i)
+char String::operator [](const int i)
 {
     assert(i >= 0 && i < Size());
     return v[i];
 }
 
-const char        String::operator [](const int i) const
+const char String::operator [](const int i) const
 {
     assert(i >= 0 && i < Size());
     return v[i];
 }
 
-bool            String::operator <(const String &s) const
+bool String::operator <(const String &s) const
 { return Equals(s); }
 
-void            String::Clear()
+void String::Clear()
 {
-    for (int i = 0; i < v.GetCapacity(); ++i)
+    for (int i = 0; i < v.GetCapacity(); ++i) {
         v[i] = 0;
+    }
 }
 
 char *String::Detach()
 { return v.Detach(); }
 
-int                String::Length(const char *s)
+int String::Length(const char *s)
 {
     int n = 0;
-    if (s)
-        while (*s++)
+    if (s) {
+        while (*s++) {
             n++;
+        }
+    }
     return n;
 }
 
-String            String::Erase(const int pos)
+String String::Erase(const int pos)
 {
     String s;
     s.Allocate(pos + 1);
@@ -102,15 +106,15 @@ String            String::Erase(const int pos)
     return *this;
 }
 
-String            String::Erase(const int pos, int len)
+String String::Erase(const int pos, int len)
 {
     int str_len = Size();
     int len_a = pos;
 
     // If erase after the length of the string, return.
-    if (len_a >= str_len)
+    if (len_a >= str_len) {
         return *this;
-
+    }
     // Prevent erasing after the end of the string.
     if ((len_a + len) > str_len) {
         // Resize the erase length.
@@ -131,7 +135,7 @@ String            String::Erase(const int pos, int len)
     return *this;
 }
 
-String            String::Extract(const int pos, const int len) const
+String String::Extract(const int pos, const int len) const
 {
     assert((pos + len) <= Size());
     String s(len);
@@ -139,53 +143,59 @@ String            String::Extract(const int pos, const int len) const
     return s;
 }
 
-const String    String::FileExtension() const
+const String String::FileExtension() const
 {
     const int n = FindLastOf(".");
     return Extract(n, Size() - n);
 }
 
-const String    String::FilenameFromPath() const
+const String String::FilenameFromPath() const
 {
     const int n = FindLastOf("/");
     return Extract(n, FindLastOf(".") - n - 1);
 }
 
-const int        String::FindFirstOf(const char *s) const
+const int String::FindFirstOf(const char *s) const
 {
     const int ss = Length(s);
     for (int i = 0; i < Size(); ++i) {
-        if ((i + ss) > Size())
+        if ((i + ss) > Size()) {
             break;
-        if (memcmp(&v[i], s, ss) == 0)
+        }
+        if (memcmp(&v[i], s, ss) == 0) {
             return i;
+        }
     }
     return -1;
 }
 
-const int        String::FindFirstOfNot(const char *s) const
+const int String::FindFirstOfNot(const char *s) const
 {
     const int ss = Length(s);
-    for (int i = 0; i < Size(); i += ss)
-        if ((memcmp(&v[i], s, ss) != 0) || (i + ss) > Size())
+    for (int i = 0; i < Size(); i += ss) {
+        if ((memcmp(&v[i], s, ss) != 0) || (i + ss) > Size()) {
             return i;
+        }
+    }
     return -1;
 }
 
-const int        String::FindLastOf(const char *s) const
+const int String::FindLastOf(const char *s) const
 {
     const int ss = Length(s);
     for (int i = Size(); i >= 0; --i) {
         int n = i - ss;
-        if (n < 0)
+        if (n < 0) {
             break;
-        if (memcmp(&v[n], s, ss) == 0)
+        }
+        if (memcmp(&v[n], s, ss) == 0) {
             return i;
+        }
     }
     return 0;
 }
 
-const int        String::FindLastOfNot(const char *s) const
+const int String::FindLastOfNot(const char *s) const
 {
     const int ss = Length(s);
     for (int i = Size(); i >= 0; i -= ss) {
@@ -196,7 +206,7 @@ const int        String::FindLastOfNot(const char *s) const
     return 0;
 }
 
-const bool        String::IsNumeric() const
+const bool String::IsNumeric() const
 {
     for (int i = 0; i < Size(); ++i)
         if (!IsCharInArray(v[i], "+-.0123456789eE"))
@@ -267,13 +277,13 @@ const String &String::RemoveOccurences(const Vector<String> &occs)
     return *this;
 }
 
-void            String::ToLower()
+void String::ToLower()
 {
     for (int i = 0; i < Size(); i++)
         v[i] = tolower(v[i]);
 }
 
-void            String::ToUpper()
+void String::ToUpper()
 {
     for (int i = 0; i < Size(); i++)
         v[i] = toupper(v[i]);
@@ -282,24 +292,24 @@ void            String::ToUpper()
 const String &String::Unquotify()
 { return *this = Extract(1, Size() - 2); }
 
-void            String::Copy(String &d, const char *s, const int len)
+void String::Copy(String &d, const char *s, const int len)
 {
     for (int i = 0; i < len; ++i)
         d.v << s[i];
     d.v[d.Size()] = 0;
 }
 
-void            String::Copy(char *d, const char *s)
+void String::Copy(char *d, const char *s)
 { Copy(d, s, Length(s)); }
 
-void            String::Copy(char *d, const char *s, const int len)
+void String::Copy(char *d, const char *s, const int len)
 {
     for (int i = 0; i < len; ++i)
         d[i] = s[i];
     d[len] = 0;
 }
 
-const bool        String::Equals(const char *a, const char *b)
+const bool String::Equals(const char *a, const char *b)
 {
     if (!b)
         return false;
@@ -309,7 +319,7 @@ const bool        String::Equals(const char *a, const char *b)
     return r;
 }
 
-const bool        String::IEquals(const char *a, const char *b)
+const bool String::IEquals(const char *a, const char *b)
 {
     if (!b)
         return false;
@@ -319,17 +329,17 @@ const bool        String::IEquals(const char *a, const char *b)
     return r;
 }
 
-void            String::Concatenate(char *dest, const char *src)
+void String::Concatenate(char *dest, const char *src)
 { Copy(dest + Length(dest), src, Length(src)); }
 
-String            String::Concatenate(const char *a, const char *b)
+String String::Concatenate(const char *a, const char *b)
 {
     String s = a;
     s += b;
     return s;
 }
 
-String            String::Format(const char *format, ...)
+String String::Format(const char *format, ...)
 {
     va_list varg;
     va_start(varg, format);
@@ -338,14 +348,14 @@ String            String::Format(const char *format, ...)
     return r;
 }
 
-String            String::FormatVarg(const char *format, va_list varg)
+String String::FormatVarg(const char *format, va_list varg)
 {
     char buf[2048] = {};
     memset(buf, 0, sizeof(buf));
-#if defined(_WIN32) || !defined(__MINGW32__)
-    vsnprintf_s(buf, sizeof(buf), _TRUNCATE, format, varg);
-#elif __linux
+#if defined(__linux) || defined(__MINGW32__)
 	vsnprintf(buf, sizeof(buf), format, varg);
+#elif defined(_WIN32)
+    vsnprintf_s(buf, sizeof(buf), _TRUNCATE, format, varg);
 #endif
     return String(buf);
 }
@@ -359,7 +369,7 @@ unsigned long String::Hash(const char *str)
     return h;
 }
 
-bool            String::IsCharInArray(char needle, const char *haystack)
+bool String::IsCharInArray(char needle, const char *haystack)
 {
     int s = Length(haystack);
     for (int i = 0; i < s; ++i)
@@ -398,7 +408,7 @@ char *String::IToS(int n, char *str)
     return str;
 }
 
-String            String::IToS(const int n)
+String String::IToS(const int n)
 {
     enum
     {
@@ -421,8 +431,8 @@ struct bTrimmedCharactersPolicy_Spaces
 const char *bTrimmedCharactersPolicy_All::val = " \t\n\r\v";
 const char *bTrimmedCharactersPolicy_Spaces::val = " ";
 
-void            String::TrimAll()
+void String::TrimAll()
 { Trim<bTrimmedCharactersPolicy_All>(); }
 
-void            String::TrimSpaces()
+void String::TrimSpaces()
 { Trim<bTrimmedCharactersPolicy_Spaces>(); }
