@@ -1,5 +1,5 @@
-#ifndef __CONTAINERS_VECTOR__
-#define __CONTAINERS_VECTOR__
+#ifndef BCOSTA_CORE_CONTAINER_VECTOR_H
+#define BCOSTA_CORE_CONTAINER_VECTOR_H
 
 #include <string.h>
 #include <assert.h>
@@ -7,14 +7,10 @@
 #include "defines.h"
 #include "shared_object.h"
 
-namespace BCosta
-{
-namespace Core
-{
-namespace Container
-{
+namespace BCosta {
+namespace Core {
+namespace Container {
 
-//!
 template<class T>
 struct StandardVectorPolicy
 {
@@ -34,7 +30,6 @@ struct StandardVectorPolicy
     { }
 };
 
-//!
 template<class T>
 struct AutoVectorPolicy
 {
@@ -60,7 +55,6 @@ struct AutoVectorPolicy
     { delete p; }
 };
 
-//!
 template<class T>
 struct SharedVectorPolicy
 {
@@ -91,7 +85,6 @@ struct SharedVectorPolicy
     { if (p) p->DecRef(); }
 };
 
-//!
 template
     <
         class T,
@@ -268,12 +261,12 @@ public:
     }
 };
 
-//!
 template<class T>
 struct AutoVector
 {
     typedef Vector<T *, AutoVectorPolicy, sizeof(T)> type;
 };
+
 template<class T>
 struct SharedVector
 {
@@ -283,4 +276,4 @@ struct SharedVector
 }
 }
 }
-#endif	// __CONTAINERS_VECTOR__
+#endif // BCOSTA_CORE_CONTAINER_VECTOR_H
