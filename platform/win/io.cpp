@@ -1,13 +1,7 @@
-/**
-	bEngine :: 2011 - 2013
-	Baptiste Costa
-*/
+#include <Windows.h>
+#include "../io.h"
 
-	#include <Windows.h>
-	#include "../io.h"
-	
-	using namespace owl;
+using namespace BCosta::Platform;
 
-//-----------------------------------------------------------------------------
-void			IO::Print(const char* out)
-{	OutputDebugStringA(out);	}
+void IO::Print(const char *out)
+{ OutputDebugStringA(out); }

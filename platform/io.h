@@ -1,17 +1,14 @@
-/*
-	engine :: 2011 - 2013
-	Baptiste Costa
-*/
+#ifndef BCOSTA_PLATFORM_IO_H
+#define BCOSTA_PLATFORM_IO_H
 
-#ifndef	__OWL_PLATFORM_IO__
-#define	__OWL_PLATFORM_IO__
+namespace BCosta {
+namespace Platform {
 
-namespace owl {
-
-struct	IO
+struct IO
 {
-static	void			Print(const char* out);
+    static void Print(const char *out);
 };
 
-}		//	owl
-#endif	//	__OWL_PLATFORM_IO__
+}
+}
+#endif // BCOSTA_PLATFORM_IO_H

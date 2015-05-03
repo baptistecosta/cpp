@@ -1,45 +1,49 @@
-/**
-	bEngine	::	2011 - 2012
-	@author		Baptiste Costa
-*/
+#ifndef BCOSTA_CORE_LOG_H
+#define BCOSTA_CORE_LOG_H
 
-#ifndef __LOG__
-#define __LOG__
+#include <stdio.h>
+#include "core/string.h"
+#include "platform/debug.h"
+#include "platform/io.h"
 
-	#include <stdio.h>
-	#include "core/string.h"
-	#include "platform/debug.h"
-	#include "platform/io.h"
-	#include "defines.h"
+namespace BCosta {
+namespace Core {
 
-namespace owl {
+class String;
 
-class	String;
-
-//!
-struct  Log
+struct Log
 {
-static	const bool		__log__;
+    static const bool __log__;
 
-static	void			i(const String& msg);
-static	void			i(const char* format, ...);
-static	void			e(const String& msg);
-static	void			e(const char* format, ...);
-static	void			w(const String& msg);
-static	void			w(const char* format, ...);
+    static void i(const String &msg);
 
-static	void			Flat(const String& msg);
-static	void			Flat(const char* format, ...);
+    static void i(const char *format, ...);
 
-static	void			Tee(FILE* f, const char* format, ...);
-static	void			Hex(const uchar* data, int len, FILE* = 0);
-static	void			Binary(const void* const ptr, size_t const size);
+    static void e(const String &msg);
 
-		// Horizontal line
-static	void			HorizontalLine();
-		// New line
-static	void			NewLine();
+    static void e(const char *format, ...);
+
+    static void w(const String &msg);
+
+    static void w(const char *format, ...);
+
+    static void Flat(const String &msg);
+
+    static void Flat(const char *format, ...);
+
+    static void Tee(FILE *f, const char *format, ...);
+
+    static void Hex(const unsigned char *data, int len, FILE * = 0);
+
+    static void Binary(const void *const ptr, size_t const size);
+
+    // Horizontal line
+    static void HorizontalLine();
+
+    // New line
+    static void NewLine();
 };
 
-}		// owl
-#endif	// __LOG__
+}
+}
+#endif // BCOSTA_CORE_LOG_H

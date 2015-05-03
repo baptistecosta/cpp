@@ -1,205 +1,223 @@
-/**
- *	bEngine :: 2011 - 2013
- *	@author Baptiste Costa
- */
+#ifndef BCOSTA_CORE_PARSER_JSON_H
+#define BCOSTA_CORE_PARSER_JSON_H
 
-#ifndef	__OWL_CORE_PARSERS_JSON__
-#define	__OWL_CORE_PARSERS_JSON__
-
-#include "core/containers/auto_ptr.h"
-#include "core/containers/hash_table.h"
-#include "core/containers/shared_pointer.h"
+#include "core/container/auto_ptr.h"
+#include "core/container/hash_table.h"
+#include "core/container/shared_pointer.h"
 #include "core/string.h"
 #include "core/uncopyable.h"
 
-namespace owl {
+namespace BCosta {
+namespace Core {
+namespace Parser {
 
-//!
 struct JSONArray;
 struct JSONString;
 struct JSONInt;
 struct JSONBool;
 
-//!
-struct JSONData : public SharedObject, private Uncopyable {
-	
-	enum {
-		TypeArray	=	0,
-		TypeObject,
-		TypeString,
-		TypeInt,
-		TypeBool,
-		TypeNull
-	};
+struct JSONData : public SharedObject, private Uncopyable
+{
 
-	uint type, level;
-	JSONData *parent, *sons;
+    enum
+    {
+        TypeArray = 0,
+        TypeObject,
+        TypeString,
+        TypeInt,
+        TypeBool,
+        TypeNull
+    };
 
-	JSONData(uint _type = 0, JSONData* _parent = 0);
+    unsigned int type, level;
+    JSONData *parent, *sons;
 
-	virtual	const String ToString();
+    JSONData(unsigned int _type = 0, JSONData *_parent = 0);
+
+    virtual const String ToString();
 };
 
-//!
-struct JSONObject : public JSONData {
-	
-	AutoHashMap<String, JSONData>::type val;
+struct JSONObject : public JSONData
+{
 
-	JSONObject();
+    AutoHashMap<String, JSONData>::type val;
 
-	const int Size() const {
-		return val.GetSize();
-	}
+    JSONObject();
 
-	JSONObject* GetObject(const String&) const;
-	JSONArray* GetArray(const String& key) const;
-	String GetString(const String&) const;
-	int GetInt(const String&) const;
-	bool GetBool(const String&) const;
+    const int Size() const
+    {
+        return val.GetSize();
+    }
 
-	JSONObject* AddJSONObject(const String&, JSONObject*);
-	JSONArray* AddJSONArray(const String&, JSONArray*);
-	void AddJSONString(const String&, JSONString*);
-	void AddJSONInt(const String&, JSONInt*);
-	void AddJSONBool(const String&, JSONBool*);
+    JSONObject *GetObject(const String &) const;
+
+    JSONArray *GetArray(const String &key) const;
+
+    String GetString(const String &) const;
+
+    int GetInt(const String &) const;
+
+    bool GetBool(const String &) const;
+
+    JSONObject *AddJSONObject(const String &, JSONObject *);
+
+    JSONArray *AddJSONArray(const String &, JSONArray *);
+
+    void AddJSONString(const String &, JSONString *);
+
+    void AddJSONInt(const String &, JSONInt *);
+
+    void AddJSONBool(const String &, JSONBool *);
 };
 
-//!
-struct	JSONArray : public JSONData {
-	
-	AutoVector<JSONData>::type val;
+struct JSONArray : public JSONData
+{
 
-	JSONArray();
+    AutoVector<JSONData>::type val;
 
-	const int Size() const {
-		return val.Size();
-	}
+    JSONArray();
 
-	template<class T> void ForEach(T func) {
-		const int s = Size();
-		for (int i = 0; i < s; ++i) {
-			func(Get(i));
-		}
-	}
+    const int Size() const
+    {
+        return val.Size();
+    }
 
-	JSONData* Get(const int);
-	const JSONData* Get(const int) const;
-	JSONObject* GetObject(const int) const;
-	JSONArray* GetArray(const int) const;
-	String GetString(const int) const;
-	int GetInt(const int) const;
-	bool GetBool(const int) const;
+    template<class T>
+    void ForEach(T func)
+    {
+        const int s = Size();
+        for (int i = 0; i < s; ++i) {
+            func(Get(i));
+        }
+    }
 
-	JSONArray* AddJSONArray(JSONArray*);
-	JSONObject* AddJSONObject(JSONObject*);
-	void AddJSONString(JSONString*);
-	void AddJSONInt(JSONInt*);
-	void AddJSONBool(JSONBool*);
+    JSONData *Get(const int);
+
+    const JSONData *Get(const int) const;
+
+    JSONObject *GetObject(const int) const;
+
+    JSONArray *GetArray(const int) const;
+
+    String GetString(const int) const;
+
+    int GetInt(const int) const;
+
+    bool GetBool(const int) const;
+
+    JSONArray *AddJSONArray(JSONArray *);
+
+    JSONObject *AddJSONObject(JSONObject *);
+
+    void AddJSONString(JSONString *);
+
+    void AddJSONInt(JSONInt *);
+
+    void AddJSONBool(JSONBool *);
 };
 
-//!
-struct JSONString : public JSONData {
+struct JSONString : public JSONData
+{
+    String val;
 
-	String val;
-	JSONString(const String&);
-	virtual	const String ToString();
+    JSONString(const String &);
+
+    virtual const String ToString();
 };
 
-//!
-struct JSONInt : public JSONData {
+struct JSONInt : public JSONData
+{
+    int val;
 
-	int val;
+    JSONInt(const int n) : JSONData(TypeInt), val(n)
+    { }
 
-	JSONInt(const int n) : JSONData(TypeInt), val(n) {
-		//
-	}
-
-	virtual	const String ToString();
+    virtual const String ToString();
 };
 
-//!
-struct JSONBool : public JSONData {
+struct JSONBool : public JSONData
+{
+    bool val;
 
-	bool val;
+    JSONBool(const bool b) : JSONData(TypeBool), val(b)
+    { }
 
-	JSONBool(const bool b) : JSONData(TypeBool), val(b) {
-		//
-	}
-
-	virtual	const String		ToString();
+    virtual const String ToString();
 };
 
-//!
-struct JSONNull : public JSONData {
+struct JSONNull : public JSONData
+{
+    JSONNull() : JSONData(TypeNull)
+    {
+        //
+    }
 
-	JSONNull() : JSONData(TypeNull) {
-		//
-	}
-
-	virtual	const String ToString();
+    virtual const String ToString();
 };
 
-//!
-class JSONBuilder {
-
-	String				o;
+class JSONBuilder
+{
+    String o;
 
 public:
+    JSONBuilder(JSONData *);
 
-	JSONBuilder(JSONData*);
-	const String& Build() {
-		return o;
-	}
+    const String &Build()
+    {
+        return o;
+    }
 
 private:
-
-	void ProcessNode(JSONData*);
+    void ProcessNode(JSONData *);
 };
 
-//!
-class JSONReader {
+class JSONReader
+{
+    enum State
+    {
+        StateKey,
+        StateValue
+    };
+    State state;
 
-	//!
-	enum State {
-		StateKey,
-		StateValue
-	};
-	State state;
+    String json, key;
+    int cursor, size;
 
-	String json, key;
-	int cursor, size;
-
-	AutoPtr<JSONData> root;
-	JSONData *current, *val;
+    AutoPtr<JSONData> root;
+    JSONData *current, *val;
 
 private:
+    void AddToCurrent();
 
-	void AddToCurrent() ;
-	const String ExtractString();
-	const String ExtractValue();
+    const String ExtractString();
+
+    const String ExtractValue();
 
 public:
+    JSONReader(const String &);
 
-	JSONReader(const String&);
+    const bool IsRootArray() const
+    {
+        return root->type == JSONData::TypeArray;
+    }
 
-	const bool IsRootArray() const {
-		return root->type == JSONData::TypeArray;
-	}
+    JSONData *GetRoot()
+    {
+        return root;
+    }
 
-	JSONData* GetRoot() {
-		return root;
-	}
+    JSONObject *GetRootObject()
+    {
+        return static_cast<JSONObject *>(root.Raw());
+    }
 
-	JSONObject* GetRootObject() {
-		return static_cast<JSONObject*>(root.Raw());
-	}
-
-	JSONArray* GetRootArray() {
-		return static_cast<JSONArray*>(root.Raw());
-	}
-
-	void Log(char);
+    JSONArray *GetRootArray()
+    {
+        return static_cast<JSONArray *>(root.Raw());
+    }
 };
 
 }
-#endif // __OWL_CORE_PARSERS_JSON__
+}
+}
+#endif // BCOSTA_CORE_PARSER_JSON_H

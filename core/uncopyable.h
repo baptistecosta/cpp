@@ -1,26 +1,24 @@
-/**
-	bEngine :: 2011 - 2013
-	Baptiste Costa
-*/
+#ifndef BCOSTA_CORE_UNCOPYABLE_H
+#define BCOSTA_CORE_UNCOPYABLE_H
 
-#ifndef	__OWL_CORE_UNCOPYABLE__
-#define	__OWL_CORE_UNCOPYABLE__
+namespace BCosta {
+namespace Core {
 
-namespace owl {
-
-//!
-class	Uncopyable
+class Uncopyable
 {
 protected:
+    Uncopyable()
+    { }
 
-		Uncopyable() {}
-		~Uncopyable() {}
+    ~Uncopyable()
+    { }
 
 private:
-		
-		Uncopyable(const Uncopyable&);
-		void			operator =	(const Uncopyable&);
+    Uncopyable(const Uncopyable &);
+
+    void operator =(const Uncopyable &);
 };
 
-}		//	owl
-#endif	//	__OWL_CORE_UNCOPYABLE__
+}
+}
+#endif // BCOSTA_CORE_UNCOPYABLE_H
